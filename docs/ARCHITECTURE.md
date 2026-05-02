@@ -1,9 +1,9 @@
 # WaveForgeStudio Architecture
-
 Prompt
   -> media packet
-  -> WaveTalk / PHIAudio / WaveRider contracts
-  -> timeline preview
-  -> production bundle
   -> render queue
-  -> future execution engine
+  -> safe queue runner
+  -> local bridge exports
+  -> production bundle
+  -> artifact ledger
+  -> future guarded render execution
