@@ -1,5 +1,6 @@
-from __future__ import annotations
+from .base import BaseAdapter
 
 
-def adapter_info() -> dict:
-    return {"status": "stub", "note": "no external integrations in v0.1"}
+class ComfyUIStubAdapter(BaseAdapter):
+    name = "comfyui"
+    kind = "preview"

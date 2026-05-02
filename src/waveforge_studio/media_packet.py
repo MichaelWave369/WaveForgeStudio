@@ -22,6 +22,7 @@ def create_media_packet(
         "sgl_policy": "intent-first-governance",
         "sml_memory": "lineage-receipt-enabled",
         "continuity_mode": "sovereign-replay-safe",
+        "coherence_threshold": C_STAR,
     }
 
     packet = {
@@ -29,6 +30,7 @@ def create_media_packet(
         "project": "WaveForgeStudio",
         "seed": seed,
         "mode": mode,
+        "duration_seconds": duration_seconds,
         "intent": {
             "prompt": prompt,
             "archetype": "sovereign_signal",
