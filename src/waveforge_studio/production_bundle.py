@@ -5,6 +5,7 @@ from pathlib import Path
 
 from .adapters.phiaudio_bridge import create_phiaudio_bundle, write_phiaudio_bundle
 from .adapters.waverider_bridge import create_waverider_bundle, write_waverider_bundle
+from .adapters.wavetalk_bridge import create_wavetalk_bundle, write_wavetalk_bundle
 from .coherence import score_media_coherence
 from .constants import C_STAR, LAMBDA, OMEGA_C, PHI
 from .hashing import canonical_json, sha256_digest
@@ -19,6 +20,7 @@ def create_production_bundle(packet: dict) -> dict:
     source_packet_hash = sha256_digest(packet)
     phia = create_phiaudio_bundle(packet)
     wave = create_waverider_bundle(packet)
+    talk = create_wavetalk_bundle(packet)
     coh = score_media_coherence(packet)
 
     bundle = {
@@ -39,10 +41,12 @@ def create_production_bundle(packet: dict) -> dict:
             "timeline_preview": "timeline_preview.html",
             "phiaudio_bundle": "phiaudio/phiaudio_bundle.json",
             "waverider_bundle": "waverider/waverider_bundle.json",
+            "wavetalk_bundle": "wavetalk/wavetalk_bundle.json",
         },
         "contracts": {
             "phiaudio": {"schema": phia["schema"], "bundle_hash": phia["receipt"]["bundle_hash"]},
             "waverider": {"schema": wave["schema"], "bundle_hash": wave["receipt"]["bundle_hash"]},
+            "wavetalk": {"schema": talk["schema"], "bundle_hash": talk["receipts"]["signal_receipt"]["bundle_hash"]},
         },
         "coherence": {
             "threshold": C_STAR,
@@ -72,6 +76,7 @@ def write_production_bundle(packet: dict, out_dir: str | Path) -> dict:
     write_timeline_preview(packet, out)
     write_phiaudio_bundle(packet, out / "phiaudio")
     write_waverider_bundle(packet, out / "waverider")
+    write_wavetalk_bundle(packet, out / "wavetalk")
 
     prod = create_production_bundle(packet)
     (out / "production_bundle.json").write_text(json.dumps(prod, indent=2, sort_keys=True), encoding="utf-8")
@@ -90,6 +95,8 @@ def write_production_bundle(packet: dict, out_dir: str | Path) -> dict:
 - Source Packet Hash: {prod['source_packet_hash']}
 - PHIAudio Bundle Hash: {prod['contracts']['phiaudio']['bundle_hash']}
 - WaveRider Bundle Hash: {prod['contracts']['waverider']['bundle_hash']}
+- WaveTalk Bundle Hash: {prod['contracts']['wavetalk']['bundle_hash']}
+- WaveTalk role: signal / governance / memory / continuity
 - Production Bundle Hash: {prod['receipt']['bundle_hash']}
 
 Generated files:
@@ -103,6 +110,7 @@ Generated files:
 - production_bundle.json
 - phiaudio/*
 - waverider/*
+- wavetalk/*
 
 Deterministic production bundle only — no media rendered in v0.4.
 """

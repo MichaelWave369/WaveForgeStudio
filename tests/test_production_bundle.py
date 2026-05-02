@@ -15,6 +15,7 @@ def test_create_production_bundle_schema_and_hashes():
         assert k in b
     assert b["contracts"]["phiaudio"]["bundle_hash"]
     assert b["contracts"]["waverider"]["bundle_hash"]
+    assert b["contracts"]["wavetalk"]["bundle_hash"]
 
 
 def test_production_bundle_determinism_and_seed_change():
@@ -32,6 +33,7 @@ def test_write_production_bundle_and_cli(tmp_path: Path):
         assert (tmp_path / fn).exists()
     assert (tmp_path / "phiaudio" / "phiaudio_bundle.json").exists()
     assert (tmp_path / "waverider" / "waverider_bundle.json").exists()
+    assert (tmp_path / "wavetalk" / "wavetalk_bundle.json").exists()
 
     env = os.environ.copy(); env["PYTHONPATH"] = "src"
     fixture = Path("tests/fixtures/sovereign_signal.project.waveforge.json")
@@ -50,3 +52,4 @@ def test_compile_bundle_flag(tmp_path: Path):
     assert (out / "timeline_preview.html").exists()
     assert (out / "phiaudio" / "phiaudio_bundle.json").exists()
     assert (out / "waverider" / "waverider_bundle.json").exists()
+    assert (out / "wavetalk" / "wavetalk_bundle.json").exists()

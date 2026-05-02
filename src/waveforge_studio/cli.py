@@ -7,6 +7,7 @@ from pathlib import Path
 from .adapters.phiaudio_bridge import write_phiaudio_bundle
 from .adapters.registry import list_adapters
 from .adapters.waverider_bridge import write_waverider_bundle
+from .adapters.wavetalk_bridge import write_wavetalk_bundle
 from .coherence import score_media_coherence
 from .media_packet import create_media_packet
 from .production_bundle import write_production_bundle
@@ -42,6 +43,8 @@ def compile_command(args: argparse.Namespace) -> int:
         write_phiaudio_bundle(packet, out / "phiaudio")
     if args.export_waverider:
         write_waverider_bundle(packet, out / "waverider")
+    if args.export_wavetalk:
+        write_wavetalk_bundle(packet, out / "wavetalk")
     if args.preview:
         write_timeline_preview(packet, out)
     return 0
@@ -88,6 +91,17 @@ def export_waverider_command(args: argparse.Namespace) -> int:
     return 0
 
 
+def export_wavetalk_command(args: argparse.Namespace) -> int:
+    packet, errors = _load_valid(args.path)
+    if errors:
+        print("INVALID media packet")
+        return 1
+    b = write_wavetalk_bundle(packet, args.out)
+    print(f"WaveTalk bundle hash: {b['receipts']['signal_receipt']['bundle_hash']}")
+    print(f"Output: {args.out}")
+    return 0
+
+
 def preview_command(args: argparse.Namespace) -> int:
     packet, errors = _load_valid(args.path)
     if errors:
@@ -120,9 +134,10 @@ def build_parser() -> argparse.ArgumentParser:
     c.add_argument("--export-phiaudio", action="store_true")
     c.add_argument("--export-waverider", action="store_true")
     c.add_argument("--preview", action="store_true")
+    c.add_argument("--export-wavetalk", action="store_true")
     c.add_argument("--bundle", action="store_true")
     c.set_defaults(func=compile_command)
-    for name, fn, out in [("validate", validate_command, False), ("inspect", inspect_command, False), ("export-phiaudio", export_phiaudio_command, True), ("export-waverider", export_waverider_command, True), ("preview", preview_command, True), ("bundle", bundle_command, True)]:
+    for name, fn, out in [("validate", validate_command, False), ("inspect", inspect_command, False), ("export-phiaudio", export_phiaudio_command, True), ("export-waverider", export_waverider_command, True), ("export-wavetalk", export_wavetalk_command, True), ("preview", preview_command, True), ("bundle", bundle_command, True)]:
         p = sub.add_parser(name)
         p.add_argument("path")
         if out:
