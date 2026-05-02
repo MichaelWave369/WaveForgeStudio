@@ -1,0 +1,6 @@
+__version__ = "1.0.0-alpha"
+RELEASE_NAME = "Golden Signal"
+PROJECT_NAME = "WaveForgeStudio"
+PROJECT_SUBTITLE = "PHI369 Sovereign Media Studio"
+DOCTRINE = "Intent → Signal → Sound → World → Artifact"
+DEFAULT_RELEASE_TIMESTAMP = "1979-03-06T03:06:09Z"
