@@ -1,0 +1,417 @@
+{
+  "audio": {
+    "key": "G mixolydian",
+    "sections": [
+      {
+        "end": 24.0,
+        "name": "act_1",
+        "start": 0.0
+      },
+      {
+        "end": 48.0,
+        "name": "act_2",
+        "start": 24.0
+      },
+      {
+        "end": 72.0,
+        "name": "act_3",
+        "start": 48.0
+      }
+    ],
+    "sonic_palette": [
+      "fractal_pad",
+      "granular_bell",
+      "sovereign_pulse"
+    ],
+    "stems": [
+      "pulse",
+      "bass",
+      "atmos",
+      "lead",
+      "percussion"
+    ],
+    "tempo_bpm": 134,
+    "voiceover_cues": [
+      {
+        "cue": "invoke_signal",
+        "timestamp": 27.504
+      },
+      {
+        "cue": "declare_intent",
+        "timestamp": 44.496
+      },
+      {
+        "cue": "seal_artifact",
+        "timestamp": 58.248
+      }
+    ]
+  },
+  "duration_seconds": 72,
+  "governance": {
+    "coherence_threshold": 0.809016994375,
+    "continuity_mode": "sovereign-replay-safe",
+    "sgl_policy": "intent-first-governance",
+    "sml_memory": "lineage-receipt-enabled"
+  },
+  "intent": {
+    "archetype": "sovereign_signal",
+    "prompt": "The Sovereign Signal awakens across the infinite fractal wave.",
+    "purpose": "compile governed audiovisual artifact"
+  },
+  "mode": "mythic-reel",
+  "project": "WaveForgeStudio",
+  "receipt": {
+    "coherence_passed": true,
+    "content_hash": "0344c955fd0bda628daa41a22f259f66ee59a55df1778498a5e11282a0861e44",
+    "created_at": "1979-03-06T03:06:09Z",
+    "lineage": [
+      "wavetalk.sgl",
+      "waverider.graph",
+      "phiaudio.plan"
+    ],
+    "packet_hash": "94edef09640e9471c447503d9c56ee894a47da826d9c99caf1b41d0829677261",
+    "project": "WaveForgeStudio",
+    "schema": "waveforge.receipt.v0",
+    "seed": 369369
+  },
+  "schema": "waveforge.media_packet.v0",
+  "seed": 369369,
+  "structure": {
+    "acts": [
+      {
+        "act": 1,
+        "end": 24.0,
+        "start": 0.0
+      },
+      {
+        "act": 2,
+        "end": 48.0,
+        "start": 24.0
+      },
+      {
+        "act": 3,
+        "end": 72.0,
+        "start": 48.0
+      }
+    ],
+    "c_star": 0.809016994375,
+    "fib_timing": [
+      0.818,
+      0.818,
+      1.636,
+      2.455,
+      4.091,
+      6.545,
+      10.636,
+      17.182,
+      27.818
+    ],
+    "lambda": 0.61803398875,
+    "omega_c": 0.376,
+    "pattern": "3-6-9",
+    "phi": 1.61803398875,
+    "phi_cuts": [
+      {
+        "ratio": 0.382,
+        "timestamp": 27.504
+      },
+      {
+        "ratio": 0.618,
+        "timestamp": 44.496
+      },
+      {
+        "ratio": 0.809,
+        "timestamp": 58.248
+      }
+    ],
+    "scenes": [
+      {
+        "end": 12.0,
+        "scene": 1,
+        "start": 0.0
+      },
+      {
+        "end": 24.0,
+        "scene": 2,
+        "start": 12.0
+      },
+      {
+        "end": 36.0,
+        "scene": 3,
+        "start": 24.0
+      },
+      {
+        "end": 48.0,
+        "scene": 4,
+        "start": 36.0
+      },
+      {
+        "end": 60.0,
+        "scene": 5,
+        "start": 48.0
+      },
+      {
+        "end": 72.0,
+        "scene": 6,
+        "start": 60.0
+      }
+    ],
+    "sync_beats": [
+      {
+        "beat": 1,
+        "timestamp": 8.0
+      },
+      {
+        "beat": 2,
+        "timestamp": 16.0
+      },
+      {
+        "beat": 3,
+        "timestamp": 24.0
+      },
+      {
+        "beat": 4,
+        "timestamp": 32.0
+      },
+      {
+        "beat": 5,
+        "timestamp": 40.0
+      },
+      {
+        "beat": 6,
+        "timestamp": 48.0
+      },
+      {
+        "beat": 7,
+        "timestamp": 56.0
+      },
+      {
+        "beat": 8,
+        "timestamp": 64.0
+      },
+      {
+        "beat": 9,
+        "timestamp": 72.0
+      }
+    ]
+  },
+  "sync": {
+    "beat_to_cut": [
+      {
+        "beat": 1,
+        "cut": 1
+      },
+      {
+        "beat": 2,
+        "cut": 2
+      },
+      {
+        "beat": 3,
+        "cut": 3
+      },
+      {
+        "beat": 4,
+        "cut": 4
+      },
+      {
+        "beat": 5,
+        "cut": 5
+      },
+      {
+        "beat": 6,
+        "cut": 6
+      },
+      {
+        "beat": 7,
+        "cut": 7
+      },
+      {
+        "beat": 8,
+        "cut": 8
+      },
+      {
+        "beat": 9,
+        "cut": 9
+      }
+    ],
+    "events": [
+      {
+        "binding": "beat_to_cut",
+        "event": 1,
+        "timestamp": 8.0
+      },
+      {
+        "binding": "beat_to_cut",
+        "event": 2,
+        "timestamp": 16.0
+      },
+      {
+        "binding": "beat_to_cut",
+        "event": 3,
+        "timestamp": 24.0
+      },
+      {
+        "binding": "beat_to_cut",
+        "event": 4,
+        "timestamp": 32.0
+      },
+      {
+        "binding": "beat_to_cut",
+        "event": 5,
+        "timestamp": 40.0
+      },
+      {
+        "binding": "beat_to_cut",
+        "event": 6,
+        "timestamp": 48.0
+      },
+      {
+        "binding": "beat_to_cut",
+        "event": 7,
+        "timestamp": 56.0
+      },
+      {
+        "binding": "beat_to_cut",
+        "event": 8,
+        "timestamp": 64.0
+      },
+      {
+        "binding": "beat_to_cut",
+        "event": 9,
+        "timestamp": 72.0
+      }
+    ],
+    "peak_to_reveal": [
+      {
+        "peak": "phi_0.809",
+        "reveal": "artifact_emergence",
+        "timestamp": 58.248
+      }
+    ],
+    "section_to_scene": [
+      {
+        "scene": 1,
+        "section": "act_1"
+      },
+      {
+        "scene": 3,
+        "section": "act_2"
+      },
+      {
+        "scene": 5,
+        "section": "act_3"
+      }
+    ],
+    "voice_to_symbol": [
+      {
+        "cue": "invoke_signal",
+        "symbol": "spiral"
+      },
+      {
+        "cue": "declare_intent",
+        "symbol": "sigil"
+      },
+      {
+        "cue": "seal_artifact",
+        "symbol": "horizon_gate"
+      }
+    ]
+  },
+  "visual": {
+    "camera_motion": [
+      "orbital",
+      "dolly_in",
+      "parallax_pan"
+    ],
+    "color_field": [
+      "obsidian",
+      "gold",
+      "violet"
+    ],
+    "render_style": "mythic-fractal-cinematic",
+    "scenes": [
+      {
+        "end": 12.0,
+        "scene": 1,
+        "start": 0.0
+      },
+      {
+        "end": 24.0,
+        "scene": 2,
+        "start": 12.0
+      },
+      {
+        "end": 36.0,
+        "scene": 3,
+        "start": 24.0
+      },
+      {
+        "end": 48.0,
+        "scene": 4,
+        "start": 36.0
+      },
+      {
+        "end": 60.0,
+        "scene": 5,
+        "start": 48.0
+      },
+      {
+        "end": 72.0,
+        "scene": 6,
+        "start": 60.0
+      }
+    ],
+    "shots": [
+      {
+        "framing": "medium",
+        "shot": 1,
+        "timestamp": 8.0
+      },
+      {
+        "framing": "medium",
+        "shot": 2,
+        "timestamp": 16.0
+      },
+      {
+        "framing": "medium",
+        "shot": 3,
+        "timestamp": 24.0
+      },
+      {
+        "framing": "medium",
+        "shot": 4,
+        "timestamp": 32.0
+      },
+      {
+        "framing": "medium",
+        "shot": 5,
+        "timestamp": 40.0
+      },
+      {
+        "framing": "medium",
+        "shot": 6,
+        "timestamp": 48.0
+      },
+      {
+        "framing": "medium",
+        "shot": 7,
+        "timestamp": 56.0
+      },
+      {
+        "framing": "medium",
+        "shot": 8,
+        "timestamp": 64.0
+      },
+      {
+        "framing": "medium",
+        "shot": 9,
+        "timestamp": 72.0
+      }
+    ],
+    "symbols": [
+      "spiral",
+      "sigil",
+      "horizon_gate"
+    ]
+  }
+}
