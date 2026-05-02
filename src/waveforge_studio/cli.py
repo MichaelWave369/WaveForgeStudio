@@ -13,6 +13,7 @@ from .queue_runner import write_queue_execution
 from .render_manifest import create_render_manifest
 from .render_queue import validate_render_queue, write_render_queue
 from .timeline_preview import write_timeline_preview
+from .av_timeline import write_av_timeline, validate_av_timeline
 from .validation import validate_media_packet
 
 def _load_valid(path:str):
@@ -29,6 +30,7 @@ def compile_command(a):
     if a.export_phiaudio: write_phiaudio_bundle(p,out/'phiaudio')
     if a.export_waverider: write_waverider_bundle(p,out/'waverider')
     if a.preview: write_timeline_preview(p,out)
+    if a.timeline: write_av_timeline(p,out)
     if a.queue: write_render_queue(p,out)
     if a.run_queue:
         r=write_queue_execution(p,out)
@@ -69,6 +71,17 @@ def queue_command(a):
     if e: print('INVALID media packet'); return 1
     print(write_render_queue(p,a.out)['receipt']['queue_hash']); return 0
 
+def timeline_command(a):
+    p,e=_load_valid(a.path)
+    if e: print('INVALID media packet'); return 1
+    t=write_av_timeline(p,a.out); print(t['receipt']['timeline_hash']); return 0
+
+
+def timeline_validate_command(a):
+    t=json.loads(Path(a.path).read_text(encoding='utf-8')); e=validate_av_timeline(t)
+    print('VALID av timeline' if not e else 'INVALID av timeline'); return 0 if not e else 1
+
+
 def queue_validate_command(a):
     q=json.loads(Path(a.path).read_text(encoding='utf-8')); e=validate_render_queue(q)
     print('VALID render queue' if not e else 'INVALID render queue'); return 0 if not e else 1
@@ -87,8 +100,8 @@ def bundle_command(a):
 
 def build_parser():
     parser=argparse.ArgumentParser(prog='waveforge-studio'); sub=parser.add_subparsers(dest='command',required=True)
-    c=sub.add_parser('compile'); c.add_argument('prompt'); c.add_argument('--duration',type=int,default=72); c.add_argument('--seed',type=int,default=369369); c.add_argument('--mode',default='mythic-reel'); c.add_argument('--out',required=True); c.add_argument('--export-phiaudio',action='store_true'); c.add_argument('--export-waverider',action='store_true'); c.add_argument('--export-wavetalk',action='store_true'); c.add_argument('--preview',action='store_true'); c.add_argument('--bundle',action='store_true'); c.add_argument('--queue',action='store_true'); c.add_argument('--run-queue',action='store_true'); c.set_defaults(func=compile_command)
-    for n,f,o in [('validate',validate_command,False),('inspect',inspect_command,False),('adapters',adapters_command,False),('queue-validate',queue_validate_command,False),('ledger',ledger_command,False),('export-phiaudio',export_phiaudio_command,True),('export-waverider',export_waverider_command,True),('export-wavetalk',export_wavetalk_command,True),('preview',preview_command,True),('queue',queue_command,True),('run-queue',run_queue_command,True),('bundle',bundle_command,True)]:
+    c=sub.add_parser('compile'); c.add_argument('prompt'); c.add_argument('--duration',type=int,default=72); c.add_argument('--seed',type=int,default=369369); c.add_argument('--mode',default='mythic-reel'); c.add_argument('--out',required=True); c.add_argument('--export-phiaudio',action='store_true'); c.add_argument('--export-waverider',action='store_true'); c.add_argument('--export-wavetalk',action='store_true'); c.add_argument('--preview',action='store_true'); c.add_argument('--timeline',action='store_true'); c.add_argument('--bundle',action='store_true'); c.add_argument('--queue',action='store_true'); c.add_argument('--run-queue',action='store_true'); c.set_defaults(func=compile_command)
+    for n,f,o in [('validate',validate_command,False),('inspect',inspect_command,False),('adapters',adapters_command,False),('timeline-validate',timeline_validate_command,False),('queue-validate',queue_validate_command,False),('ledger',ledger_command,False),('export-phiaudio',export_phiaudio_command,True),('export-waverider',export_waverider_command,True),('export-wavetalk',export_wavetalk_command,True),('preview',preview_command,True),('timeline',timeline_command,True),('queue',queue_command,True),('run-queue',run_queue_command,True),('bundle',bundle_command,True)]:
         p=sub.add_parser(n); p.add_argument('path');
         if o: p.add_argument('--out',required=True)
         p.set_defaults(func=f)

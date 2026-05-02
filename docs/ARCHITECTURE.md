@@ -1,9 +1,12 @@
 # WaveForgeStudio Architecture
 Prompt
   -> media packet
-  -> render queue
-  -> safe queue runner
-  -> local bridge exports
+  -> audio graph / visual graph / sync lattice
+  -> unified AV timeline
+  -> bridge bundles
+  -> timeline preview
   -> production bundle
+  -> render queue
+  -> safe runner
   -> artifact ledger
   -> future guarded render execution

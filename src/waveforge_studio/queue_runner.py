@@ -11,6 +11,7 @@ from .hashing import canonical_json, sha256_digest
 from .production_bundle import write_production_bundle
 from .render_queue import create_render_queue, validate_render_queue
 from .timeline_preview import write_timeline_preview
+from .av_timeline import write_av_timeline
 from .validation import validate_media_packet
 
 _STABLE_TS = "1979-03-06T03:06:09Z"
@@ -52,6 +53,7 @@ def run_queue_safe(packet: dict, out_dir: str | Path, queue: dict | None = None)
             status, executed = "failed", False; failed += 1
         jobs_report.append({"id": jid, "status": status, "executed": executed, "outputs": job.get("outputs", [])})
 
+    write_av_timeline(packet, out)
     ledger = write_artifact_ledger(out)
     completed = sum(1 for j in jobs_report if j["status"] == "completed")
     blocked = sum(1 for j in jobs_report if j["status"] == "blocked_plan_only")

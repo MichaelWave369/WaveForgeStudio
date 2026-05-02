@@ -11,6 +11,7 @@ from .constants import C_STAR, LAMBDA, OMEGA_C, PHI
 from .hashing import canonical_json, sha256_digest
 from .render_manifest import create_render_manifest
 from .timeline_preview import write_timeline_preview
+from .av_timeline import write_av_timeline, create_av_timeline
 
 _STABLE_TS = "1979-03-06T03:06:09Z"
 _DOCTRINE = "Intent → Signal → Sound → World → Artifact"
@@ -43,6 +44,7 @@ def create_production_bundle(packet: dict) -> dict:
             "waverider_bundle": "waverider/waverider_bundle.json",
             "wavetalk_bundle": "wavetalk/wavetalk_bundle.json",
             "render_queue": "render_queue.json",
+            "av_timeline": "av_timeline.json",
         },
         "contracts": {
             "phiaudio": {"schema": phia["schema"], "bundle_hash": phia["receipt"]["bundle_hash"]},
@@ -75,6 +77,7 @@ def write_production_bundle(packet: dict, out_dir: str | Path) -> dict:
     (out / "render_manifest.json").write_text(json.dumps(create_render_manifest(packet), indent=2, sort_keys=True), encoding="utf-8")
     (out / "receipt.json").write_text(json.dumps(packet.get("receipt", {}), indent=2, sort_keys=True), encoding="utf-8")
     write_timeline_preview(packet, out)
+    av = write_av_timeline(packet, out)
     write_phiaudio_bundle(packet, out / "phiaudio")
     write_waverider_bundle(packet, out / "waverider")
     write_wavetalk_bundle(packet, out / "wavetalk")
@@ -98,6 +101,8 @@ def write_production_bundle(packet: dict, out_dir: str | Path) -> dict:
 - WaveRider Bundle Hash: {prod['contracts']['waverider']['bundle_hash']}
 - WaveTalk Bundle Hash: {prod['contracts']['wavetalk']['bundle_hash']}
 - WaveTalk role: signal / governance / memory / continuity
+- AV Timeline Hash: {av['receipt']['timeline_hash']}
+- AV timeline role: unified audio/video timing contract
 - Production Bundle Hash: {prod['receipt']['bundle_hash']}
 
 Generated files:

@@ -1,17 +1,12 @@
-# WaveForgeStudio — PHI369 Sovereign Media Studio (v0.7)
+# WaveForgeStudio — PHI369 Sovereign Media Studio (v0.8)
 
-## Safe Queue Runner
-v0.7 adds safe local export execution from render queue; future render jobs stay blocked.
-
-## Artifact Ledger
-Deterministic artifact hash ledger for auditable output directories.
+## Unified AV Timeline
+Deterministic unified audio/video timing contract and future source of truth for render orchestration.
 
 ## CLI
 ```bash
-waveforge-studio run-queue project.waveforge.json --out runs/example
-waveforge-studio ledger runs/example
-waveforge-studio compile "prompt" --out runs/example --run-queue
-waveforge-studio compile "prompt" --out runs/example --bundle --queue --run-queue
+waveforge-studio timeline project.waveforge.json --out runs/example
+waveforge-studio timeline-validate runs/example/av_timeline.json
+waveforge-studio compile "prompt" --out runs/example --timeline
+waveforge-studio compile "prompt" --out runs/example --bundle --queue --run-queue --timeline
 ```
-
-Safe local exports only; no media rendering.
