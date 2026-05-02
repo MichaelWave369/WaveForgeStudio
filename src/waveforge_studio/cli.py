@@ -8,8 +8,8 @@ from .adapters.phiaudio_bridge import write_phiaudio_bundle
 from .adapters.registry import list_adapters
 from .adapters.waverider_bridge import write_waverider_bundle
 from .coherence import score_media_coherence
-from .constants import C_STAR, LAMBDA, OMEGA_C, PHI
 from .media_packet import create_media_packet
+from .production_bundle import write_production_bundle
 from .render_manifest import create_render_manifest
 from .timeline_preview import write_timeline_preview
 from .validation import validate_media_packet
@@ -19,21 +19,25 @@ def _write_json(path: Path, data: dict) -> None:
     path.write_text(json.dumps(data, indent=2, sort_keys=True), encoding="utf-8")
 
 
+def _load_valid(path: str) -> tuple[dict, list[str]]:
+    packet = json.loads(Path(path).read_text(encoding="utf-8"))
+    return packet, validate_media_packet(packet)
+
+
 def compile_command(args: argparse.Namespace) -> int:
     out = Path(args.out)
     out.mkdir(parents=True, exist_ok=True)
     packet = create_media_packet(args.prompt, duration_seconds=args.duration, seed=args.seed, mode=args.mode)
-    manifest = create_render_manifest(packet)
     _write_json(out / "project.waveforge.json", packet)
     _write_json(out / "audio_graph.json", packet["audio"])
     _write_json(out / "visual_graph.json", packet["visual"])
     _write_json(out / "sync_lattice.json", packet["sync"])
-    _write_json(out / "render_manifest.json", manifest)
+    _write_json(out / "render_manifest.json", create_render_manifest(packet))
     _write_json(out / "receipt.json", packet["receipt"])
-    (out / "shotlist.md").write_text("# Shotlist\n", encoding="utf-8")
-    (out / "voiceover.md").write_text("# Voiceover Cues\n", encoding="utf-8")
-    coherence = score_media_coherence(packet)
-    (out / "summary.md").write_text(f"# WaveForgeStudio Run Summary\n\n- Coherence Overall: {coherence['overall']}\n", encoding="utf-8")
+    (out / "summary.md").write_text(f"# WaveForgeStudio Run Summary\n\n- Coherence Overall: {score_media_coherence(packet)['overall']}\n", encoding="utf-8")
+    if args.bundle:
+        write_production_bundle(packet, out)
+        return 0
     if args.export_phiaudio:
         write_phiaudio_bundle(packet, out / "phiaudio")
     if args.export_waverider:
@@ -43,17 +47,10 @@ def compile_command(args: argparse.Namespace) -> int:
     return 0
 
 
-def _load_valid(path: str) -> tuple[dict, list[str]]:
-    packet = json.loads(Path(path).read_text(encoding="utf-8"))
-    return packet, validate_media_packet(packet)
-
-
 def validate_command(args: argparse.Namespace) -> int:
     _, errors = _load_valid(args.path)
     if errors:
         print("INVALID media packet")
-        for e in errors:
-            print(f"- {e}")
         return 1
     print("VALID media packet")
     return 0
@@ -61,8 +58,8 @@ def validate_command(args: argparse.Namespace) -> int:
 
 def inspect_command(args: argparse.Namespace) -> int:
     packet, _ = _load_valid(args.path)
-    coherence = score_media_coherence(packet)
-    print(json.dumps({"project": packet.get("project"), "schema": packet.get("schema"), "seed": packet.get("seed"), "mode": packet.get("mode"), "prompt": packet.get("intent", {}).get("prompt"), "duration": packet.get("duration_seconds"), "audio_sections": len(packet.get("audio", {}).get("sections", [])), "visual_scenes": len(packet.get("visual", {}).get("scenes", [])), "sync_events": len(packet.get("sync", {}).get("events", [])), "coherence_overall": coherence.get("overall"), "coherence_passed": coherence.get("passed"), "packet_hash": packet.get("receipt", {}).get("packet_hash")}, indent=2, sort_keys=True))
+    c = score_media_coherence(packet)
+    print(json.dumps({"project": packet.get("project"), "schema": packet.get("schema"), "seed": packet.get("seed"), "mode": packet.get("mode"), "prompt": packet.get("intent", {}).get("prompt"), "duration": packet.get("duration_seconds"), "audio_sections": len(packet.get("audio", {}).get("sections", [])), "visual_scenes": len(packet.get("visual", {}).get("scenes", [])), "sync_events": len(packet.get("sync", {}).get("events", [])), "coherence_overall": c.get("overall"), "coherence_passed": c.get("passed"), "packet_hash": packet.get("receipt", {}).get("packet_hash")}, indent=2, sort_keys=True))
     return 0
 
 
@@ -76,8 +73,8 @@ def export_phiaudio_command(args: argparse.Namespace) -> int:
     if errors:
         print("INVALID media packet")
         return 1
-    bundle = write_phiaudio_bundle(packet, args.out)
-    print(f"PHIAudio bundle hash: {bundle['receipt']['bundle_hash']}")
+    b = write_phiaudio_bundle(packet, args.out)
+    print(f"PHIAudio bundle hash: {b['receipt']['bundle_hash']}")
     return 0
 
 
@@ -86,8 +83,8 @@ def export_waverider_command(args: argparse.Namespace) -> int:
     if errors:
         print("INVALID media packet")
         return 1
-    bundle = write_waverider_bundle(packet, args.out)
-    print(f"WaveRider bundle hash: {bundle['receipt']['bundle_hash']}")
+    b = write_waverider_bundle(packet, args.out)
+    print(f"WaveRider bundle hash: {b['receipt']['bundle_hash']}")
     return 0
 
 
@@ -96,8 +93,18 @@ def preview_command(args: argparse.Namespace) -> int:
     if errors:
         print("INVALID media packet")
         return 1
-    out = write_timeline_preview(packet, args.out)
-    print(f"Timeline preview: {out}")
+    print(f"Timeline preview: {write_timeline_preview(packet, args.out)}")
+    return 0
+
+
+def bundle_command(args: argparse.Namespace) -> int:
+    packet, errors = _load_valid(args.path)
+    if errors:
+        print("INVALID media packet")
+        return 1
+    b = write_production_bundle(packet, args.out)
+    print(f"Production bundle hash: {b['receipt']['bundle_hash']}")
+    print(f"Output: {args.out}")
     return 0
 
 
@@ -113,8 +120,9 @@ def build_parser() -> argparse.ArgumentParser:
     c.add_argument("--export-phiaudio", action="store_true")
     c.add_argument("--export-waverider", action="store_true")
     c.add_argument("--preview", action="store_true")
+    c.add_argument("--bundle", action="store_true")
     c.set_defaults(func=compile_command)
-    for name, fn, out in [("validate", validate_command, False), ("inspect", inspect_command, False), ("export-phiaudio", export_phiaudio_command, True), ("export-waverider", export_waverider_command, True), ("preview", preview_command, True)]:
+    for name, fn, out in [("validate", validate_command, False), ("inspect", inspect_command, False), ("export-phiaudio", export_phiaudio_command, True), ("export-waverider", export_waverider_command, True), ("preview", preview_command, True), ("bundle", bundle_command, True)]:
         p = sub.add_parser(name)
         p.add_argument("path")
         if out:
@@ -126,7 +134,8 @@ def build_parser() -> argparse.ArgumentParser:
 
 
 def main() -> int:
-    args = build_parser().parse_args()
+    parser = build_parser()
+    args = parser.parse_args()
     return args.func(args)
 
 

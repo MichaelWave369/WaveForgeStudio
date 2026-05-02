@@ -1,9 +1,9 @@
 # WaveForgeStudio Architecture
 
-WaveForge packet
+Prompt
+  -> WaveForge media packet
   -> PHIAudio bundle
   -> WaveRider bundle
   -> Timeline preview
-  -> future unified render orchestration
-
-WaveForgeStudio = WaveTalk × PHIAudio × WaveRider
+  -> Unified production bundle
+  -> future render orchestration
