@@ -8,6 +8,7 @@
 - Phase 1.1:
   - v0.2.1 Visual Timeline Preview
 - Phase 2: WaveRider visual graph adapter
+  - v0.3 WaveRider Visual Bridge Contract (started)
 - Phase 3: WaveTalk/SGL/SML continuity adapter
 - Phase 4: ComfyUI / PhiOS previews
 - Phase 5: real render orchestration
