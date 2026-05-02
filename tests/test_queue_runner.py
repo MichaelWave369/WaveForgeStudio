@@ -28,6 +28,7 @@ def test_execution_deterministic_and_write(tmp_path: Path):
     assert (tmp_path / "a" / "execution_receipt.json").exists()
     assert (tmp_path / "a" / "artifact_ledger.json").exists()
     assert (tmp_path / "a" / "av_timeline.json").exists()
+    assert (tmp_path / "a" / "renderer_handoff.json").exists()
 
 
 def test_cli_run_queue_ledger_and_compile_flags(tmp_path: Path):

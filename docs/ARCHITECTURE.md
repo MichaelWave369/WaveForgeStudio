@@ -1,8 +1,8 @@
 # WaveForgeStudio Architecture
 Prompt
   -> media packet
-  -> audio graph / visual graph / sync lattice
-  -> unified AV timeline
+  -> AV timeline
+  -> renderer handoff pack
   -> bridge bundles
   -> timeline preview
   -> production bundle
