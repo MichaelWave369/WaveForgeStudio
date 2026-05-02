@@ -10,6 +10,7 @@ from .coherence import score_media_coherence
 from .constants import C_STAR, LAMBDA, OMEGA_C, PHI
 from .media_packet import create_media_packet
 from .render_manifest import create_render_manifest
+from .timeline_preview import write_timeline_preview
 from .validation import validate_media_packet
 
 
@@ -57,6 +58,8 @@ def compile_command(args: argparse.Namespace) -> int:
 
     if args.export_phiaudio:
         write_phiaudio_bundle(packet, out / "phiaudio")
+    if args.preview:
+        write_timeline_preview(packet, out)
     return 0
 
 
@@ -112,6 +115,19 @@ def export_phiaudio_command(args: argparse.Namespace) -> int:
     return 0
 
 
+def preview_command(args: argparse.Namespace) -> int:
+    packet = json.loads(Path(args.path).read_text(encoding="utf-8"))
+    errors = validate_media_packet(packet)
+    if errors:
+        print("INVALID media packet")
+        for e in errors:
+            print(f"- {e}")
+        return 1
+    out = write_timeline_preview(packet, args.out)
+    print(f"Timeline preview: {out}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="waveforge-studio")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -123,6 +139,7 @@ def build_parser() -> argparse.ArgumentParser:
     c.add_argument("--mode", default="mythic-reel")
     c.add_argument("--out", required=True)
     c.add_argument("--export-phiaudio", action="store_true")
+    c.add_argument("--preview", action="store_true")
     c.set_defaults(func=compile_command)
 
     v = sub.add_parser("validate")
@@ -140,6 +157,11 @@ def build_parser() -> argparse.ArgumentParser:
     e.add_argument("path")
     e.add_argument("--out", required=True)
     e.set_defaults(func=export_phiaudio_command)
+
+    p = sub.add_parser("preview")
+    p.add_argument("path")
+    p.add_argument("--out", required=True)
+    p.set_defaults(func=preview_command)
     return parser
 
 
