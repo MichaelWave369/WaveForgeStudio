@@ -4,6 +4,7 @@ import argparse
 import json
 from pathlib import Path
 
+from .adapters.phiaudio_bridge import write_phiaudio_bundle
 from .adapters.registry import list_adapters
 from .coherence import score_media_coherence
 from .constants import C_STAR, LAMBDA, OMEGA_C, PHI
@@ -53,6 +54,9 @@ def compile_command(args: argparse.Namespace) -> int:
 - Receipt Hash: {packet['receipt']['packet_hash']}
 """
     (out / "summary.md").write_text(summary, encoding="utf-8")
+
+    if args.export_phiaudio:
+        write_phiaudio_bundle(packet, out / "phiaudio")
     return 0
 
 
@@ -94,6 +98,20 @@ def adapters_command(args: argparse.Namespace) -> int:
     return 0
 
 
+def export_phiaudio_command(args: argparse.Namespace) -> int:
+    packet = json.loads(Path(args.path).read_text(encoding="utf-8"))
+    errors = validate_media_packet(packet)
+    if errors:
+        print("INVALID media packet")
+        for e in errors:
+            print(f"- {e}")
+        return 1
+    bundle = write_phiaudio_bundle(packet, args.out)
+    print(f"PHIAudio bundle hash: {bundle['receipt']['bundle_hash']}")
+    print(f"Output: {args.out}")
+    return 0
+
+
 def build_parser() -> argparse.ArgumentParser:
     parser = argparse.ArgumentParser(prog="waveforge-studio")
     sub = parser.add_subparsers(dest="command", required=True)
@@ -104,6 +122,7 @@ def build_parser() -> argparse.ArgumentParser:
     c.add_argument("--seed", type=int, default=369369)
     c.add_argument("--mode", default="mythic-reel")
     c.add_argument("--out", required=True)
+    c.add_argument("--export-phiaudio", action="store_true")
     c.set_defaults(func=compile_command)
 
     v = sub.add_parser("validate")
@@ -116,6 +135,11 @@ def build_parser() -> argparse.ArgumentParser:
 
     a = sub.add_parser("adapters")
     a.set_defaults(func=adapters_command)
+
+    e = sub.add_parser("export-phiaudio")
+    e.add_argument("path")
+    e.add_argument("--out", required=True)
+    e.set_defaults(func=export_phiaudio_command)
     return parser
 
 

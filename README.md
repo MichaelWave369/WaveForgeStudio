@@ -1,38 +1,28 @@
-# WaveForgeStudio — PHI369 Sovereign Media Studio (v0.1.1)
+# WaveForgeStudio — PHI369 Sovereign Media Studio (v0.2)
 
-**Doctrine:** WaveForgeStudio compiles one governed creative intent into synchronized audio, visual, motion, memory, and render artifacts.
+WaveForgeStudio compiles one governed creative intent into synchronized audio, visual, motion, memory, and render artifacts.
 
-**Tagline:** Intent → Signal → Sound → World → Artifact
-
-## Architecture (text diagram)
-WaveForgeStudio = WaveTalk × PHIAudio × WaveRider
-
-## Quickstart
-```bash
-pip install -e .[dev]
-python -m pytest
-```
+## Core doctrine
+WaveForgeStudio does not glue songs onto videos.
+It compiles one governed creative intent into synchronized artifacts.
 
 ## CLI
 ```bash
-waveforge-studio compile "The Sovereign Signal awakens across the infinite fractal wave." --duration 72 --seed 369369 --out runs/sovereign_signal
-waveforge-studio validate runs/sovereign_signal/project.waveforge.json
-waveforge-studio inspect runs/sovereign_signal/project.waveforge.json
+waveforge-studio compile "prompt" --out runs/example
+waveforge-studio compile "prompt" --out runs/example --export-phiaudio
+waveforge-studio export-phiaudio runs/example/project.waveforge.json --out runs/example/phiaudio
+waveforge-studio validate runs/example/project.waveforge.json
+waveforge-studio inspect runs/example/project.waveforge.json
 waveforge-studio adapters
 ```
 
-Compile writes deterministic artifacts including `summary.md`.
+## PHIAudio Bridge (v0.2)
+WaveForge media packet → PHIAudio production bundle via deterministic bridge contract.
+This is a planning/export layer only, not real audio rendering.
 
-## PHI369 constants
-- PHI = 1.61803398875
-- LAMBDA = 0.61803398875
-- C_STAR = PHI / 2
-- OMEGA_C = 47 / 125
+See `docs/PHIAUDIO_BRIDGE.md`.
 
-## MVP limitations
-- Deterministic manifests only (no real media rendering)
-- No external API calls or vendor integrations
-- Adapter modules are stubs
-
-## Private / Proprietary
-Private proprietary work for PHI369 Labs / Parallax.
+## Limitations
+- No external API calls.
+- No vendor integrations.
+- Deterministic manifests/contracts only.
