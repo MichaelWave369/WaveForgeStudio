@@ -42,6 +42,7 @@ def create_production_bundle(packet: dict) -> dict:
             "phiaudio_bundle": "phiaudio/phiaudio_bundle.json",
             "waverider_bundle": "waverider/waverider_bundle.json",
             "wavetalk_bundle": "wavetalk/wavetalk_bundle.json",
+            "render_queue": "render_queue.json",
         },
         "contracts": {
             "phiaudio": {"schema": phia["schema"], "bundle_hash": phia["receipt"]["bundle_hash"]},

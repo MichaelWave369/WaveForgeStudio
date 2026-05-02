@@ -12,6 +12,7 @@ from .coherence import score_media_coherence
 from .media_packet import create_media_packet
 from .production_bundle import write_production_bundle
 from .render_manifest import create_render_manifest
+from .render_queue import validate_render_queue, write_render_queue
 from .timeline_preview import write_timeline_preview
 from .validation import validate_media_packet
 
@@ -38,6 +39,8 @@ def compile_command(args: argparse.Namespace) -> int:
     (out / "summary.md").write_text(f"# WaveForgeStudio Run Summary\n\n- Coherence Overall: {score_media_coherence(packet)['overall']}\n", encoding="utf-8")
     if args.bundle:
         write_production_bundle(packet, out)
+        if args.queue:
+            write_render_queue(packet, out)
         return 0
     if args.export_phiaudio:
         write_phiaudio_bundle(packet, out / "phiaudio")
@@ -47,6 +50,8 @@ def compile_command(args: argparse.Namespace) -> int:
         write_wavetalk_bundle(packet, out / "wavetalk")
     if args.preview:
         write_timeline_preview(packet, out)
+    if args.queue:
+        write_render_queue(packet, out)
     return 0
 
 
@@ -111,6 +116,29 @@ def preview_command(args: argparse.Namespace) -> int:
     return 0
 
 
+def queue_command(args: argparse.Namespace) -> int:
+    packet, errors = _load_valid(args.path)
+    if errors:
+        print("INVALID media packet")
+        return 1
+    q = write_render_queue(packet, args.out)
+    print(f"Render queue hash: {q['receipt']['queue_hash']}")
+    print(f"Output: {args.out}")
+    return 0
+
+
+def queue_validate_command(args: argparse.Namespace) -> int:
+    q = json.loads(Path(args.path).read_text(encoding="utf-8"))
+    errs = validate_render_queue(q)
+    if errs:
+        print("INVALID render queue")
+        for e in errs:
+            print(f"- {e}")
+        return 1
+    print("VALID render queue")
+    return 0
+
+
 def bundle_command(args: argparse.Namespace) -> int:
     packet, errors = _load_valid(args.path)
     if errors:
@@ -136,8 +164,9 @@ def build_parser() -> argparse.ArgumentParser:
     c.add_argument("--preview", action="store_true")
     c.add_argument("--export-wavetalk", action="store_true")
     c.add_argument("--bundle", action="store_true")
+    c.add_argument("--queue", action="store_true")
     c.set_defaults(func=compile_command)
-    for name, fn, out in [("validate", validate_command, False), ("inspect", inspect_command, False), ("export-phiaudio", export_phiaudio_command, True), ("export-waverider", export_waverider_command, True), ("export-wavetalk", export_wavetalk_command, True), ("preview", preview_command, True), ("bundle", bundle_command, True)]:
+    for name, fn, out in [("validate", validate_command, False), ("inspect", inspect_command, False), ("queue-validate", queue_validate_command, False), ("export-phiaudio", export_phiaudio_command, True), ("export-waverider", export_waverider_command, True), ("export-wavetalk", export_wavetalk_command, True), ("preview", preview_command, True), ("queue", queue_command, True), ("bundle", bundle_command, True)]:
         p = sub.add_parser(name)
         p.add_argument("path")
         if out:

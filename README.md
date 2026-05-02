@@ -1,21 +1,16 @@
-# WaveForgeStudio — PHI369 Sovereign Media Studio (v0.5)
+# WaveForgeStudio — PHI369 Sovereign Media Studio (v0.6)
 
 WaveForgeStudio compiles governed intent into synchronized artifacts.
 
-## WaveTalk Bridge (v0.5)
-Deterministic sovereign signal/governance/memory bundle export contract (no network runtime).
-
-## Unified Production Bundle (recommended v0.5 export)
-Bundle mode now includes WaveTalk + PHIAudio + WaveRider + Timeline Preview outputs in one deterministic auditable package.
+## Render Queue / Job Manifest (v0.6)
+Deterministic plan-only orchestration queue for future safe local render execution.
 
 ## CLI
 ```bash
-waveforge-studio export-wavetalk project.waveforge.json --out runs/example/wavetalk
-waveforge-studio compile "prompt" --out runs/example --export-wavetalk
-waveforge-studio compile "prompt" --out runs/example --export-wavetalk --export-phiaudio --export-waverider --preview
-waveforge-studio bundle project.waveforge.json --out runs/example_bundle
-waveforge-studio compile "prompt" --out runs/example --bundle
+waveforge-studio queue project.waveforge.json --out runs/example
+waveforge-studio queue-validate runs/example/render_queue.json
+waveforge-studio compile "prompt" --out runs/example --queue
+waveforge-studio compile "prompt" --out runs/example --bundle --queue
 ```
 
-## Limitations
-Deterministic contracts only — no real signal, audio, or visual rendering runtime in v0.5.
+Plan-only orchestration; no runtime execution.

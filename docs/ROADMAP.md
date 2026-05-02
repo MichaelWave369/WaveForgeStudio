@@ -13,5 +13,7 @@
   - v0.4 Unified Production Bundle
 - Phase 3: WaveTalk/SGL/SML continuity adapter
   - v0.5 WaveTalk Sovereign Signal Bridge (started)
+- Phase 3.1:
+  - v0.6 Render Queue / Job Manifest
 - Phase 4: ComfyUI / PhiOS previews
 - Phase 5: real render orchestration
