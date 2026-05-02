@@ -1,0 +1,32 @@
+from __future__ import annotations
+import json
+from pathlib import Path
+
+_SCHEMAS = [
+("waveforge.media_packet.v0","v0","intent packet","project.waveforge.json"),
+("waveforge.receipt.v0","v0","packet receipt","receipt.json"),
+("waveforge.phiaudio_bundle.v0","v0","audio bridge","phiaudio/phiaudio_bundle.json"),
+("waveforge.waverider_bundle.v0","v0","visual bridge","waverider/waverider_bundle.json"),
+("waveforge.wavetalk_bundle.v0","v0","signal bridge","wavetalk/wavetalk_bundle.json"),
+("waveforge.production_bundle.v0","v0","unified bundle","production_bundle.json"),
+("waveforge.render_queue.v0","v0","queue manifest","render_queue.json"),
+("waveforge.safe_queue_execution.v0","v0","safe execution report","execution_report.json"),
+("waveforge.artifact_ledger.v0","v0","artifact ledger","artifact_ledger.json"),
+("waveforge.av_timeline.v0","v0","av timeline","av_timeline.json"),
+("waveforge.renderer_handoff.v0","v0","renderer handoff","renderer_handoff.json"),
+]
+
+def list_schemas() -> list[dict]:
+    return [{"name":n,"version":v,"role":r,"primary_file":f,"status":"alpha_contract"} for n,v,r,f in _SCHEMAS]
+
+def get_schema(name:str)->dict|None:
+    for s in list_schemas():
+        if s['name']==name: return s
+    return None
+
+def write_schema_registry(out_dir:str|Path)->dict:
+    out=Path(out_dir); out.mkdir(parents=True,exist_ok=True)
+    payload={"schema":"waveforge.schema_registry.v1_alpha","schemas":list_schemas()}
+    (out/'schema_registry.json').write_text(json.dumps(payload,indent=2,sort_keys=True),encoding='utf-8')
+    (out/'SCHEMA_REGISTRY.md').write_text('# Schema Registry\n\n'+'\n'.join([f"- {s['name']}" for s in payload['schemas']]),encoding='utf-8')
+    return payload
