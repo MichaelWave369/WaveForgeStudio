@@ -88,3 +88,86 @@ python -m waveforge_studio.cli preview-pack-validate runs/golden_demo_full_previ
 python -m waveforge_studio.cli forge "The Sovereign Signal awakens across the infinite fractal wave." --out runs/golden_demo_pack --render-audio-stub --render-visual-stub --av-preview --preview-pack
 python -m waveforge_studio.cli smoke --out runs/golden_demo_smoke_pack --render-audio-stub --render-visual-stub --av-preview --preview-pack
 ```
+
+## Deterministic Preview Pack ZIP
+
+```bash
+python -m waveforge_studio.cli zip-preview-pack runs/golden_demo_pack/preview_pack
+python -m waveforge_studio.cli preview-pack-zip-validate runs/golden_demo_pack/preview_pack/preview_pack_zip_manifest.json
+python -m waveforge_studio.cli forge "The Sovereign Signal awakens across the infinite fractal wave." --out runs/golden_demo_zip --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+python -m waveforge_studio.cli smoke --out runs/golden_demo_smoke_zip --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+```
+
+## Local Demo Gallery
+
+```bash
+python -m waveforge_studio.cli gallery runs --out runs/gallery
+python -m waveforge_studio.cli gallery-validate runs/gallery/gallery_manifest.json
+
+python -m waveforge_studio.cli forge "Demo one" --out runs/demo_one --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+python -m waveforge_studio.cli forge "Demo two" --out runs/demo_two --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+python -m waveforge_studio.cli gallery runs --out runs/gallery
+```
+
+- searchable gallery with prompt/hash search and tag filtering
+
+## Gallery Collections
+
+```bash
+python -m waveforge_studio.cli collection runs/gallery/gallery_manifest.json --out runs/gallery/collection --title "Golden Signal Showcase"
+python -m waveforge_studio.cli collection runs/gallery/gallery_manifest.json --out runs/gallery/collection_ready --include-tag alpha-ready --include-tag has-zip
+python -m waveforge_studio.cli collection-validate runs/gallery/collection/collection_manifest.json
+```
+
+## Collection Export Pack
+
+```bash
+python -m waveforge_studio.cli collection-export runs/gallery/collection/collection_manifest.json --out runs/gallery/collection_export
+python -m waveforge_studio.cli collection-export-validate runs/gallery/collection_export/collection_export_manifest.json
+
+python -m waveforge_studio.cli forge "Collection Export Demo One" --out runs/export_demo_one --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+python -m waveforge_studio.cli forge "Collection Export Demo Two" --out runs/export_demo_two --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+python -m waveforge_studio.cli gallery runs --out runs/gallery
+python -m waveforge_studio.cli collection runs/gallery/gallery_manifest.json --out runs/gallery/collection --title "Golden Signal Release" --include-tag has-zip
+python -m waveforge_studio.cli collection-export runs/gallery/collection/collection_manifest.json --out runs/gallery/collection_export
+```
+
+## Alpha Release Deck
+
+```bash
+python -m waveforge_studio.cli release-deck runs/gallery/collection_export/collection_export_manifest.json --out runs/gallery/collection_export/release_deck --title "Golden Signal Release Deck"
+python -m waveforge_studio.cli release-deck-validate runs/gallery/collection_export/release_deck/release_deck_manifest.json
+
+python -m waveforge_studio.cli forge "Deck Demo One" --out runs/deck_demo_one --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+python -m waveforge_studio.cli forge "Deck Demo Two" --out runs/deck_demo_two --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+python -m waveforge_studio.cli gallery runs --out runs/gallery
+python -m waveforge_studio.cli collection runs/gallery/gallery_manifest.json --out runs/gallery/collection --title "Golden Signal Release" --include-tag has-zip
+python -m waveforge_studio.cli collection-export runs/gallery/collection/collection_manifest.json --out runs/gallery/collection_export
+python -m waveforge_studio.cli release-deck runs/gallery/collection_export/collection_export_manifest.json --out runs/gallery/collection_export/release_deck --title "Golden Signal Release Deck"
+```
+
+## Deterministic Release Deck ZIP
+
+```bash
+python -m waveforge_studio.cli zip-release-deck runs/gallery/collection_export/release_deck
+python -m waveforge_studio.cli release-deck-zip-validate runs/gallery/collection_export/release_deck/release_deck_zip_manifest.json
+
+python -m waveforge_studio.cli forge "Deck Zip Demo One" --out runs/deck_zip_demo_one --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+python -m waveforge_studio.cli forge "Deck Zip Demo Two" --out runs/deck_zip_demo_two --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+python -m waveforge_studio.cli gallery runs --out runs/gallery
+python -m waveforge_studio.cli collection runs/gallery/gallery_manifest.json --out runs/gallery/collection --title "Golden Signal Release" --include-tag has-zip
+python -m waveforge_studio.cli collection-export runs/gallery/collection/collection_manifest.json --out runs/gallery/collection_export
+python -m waveforge_studio.cli release-deck runs/gallery/collection_export/collection_export_manifest.json --out runs/gallery/collection_export/release_deck --title "Golden Signal Release Deck"
+python -m waveforge_studio.cli zip-release-deck runs/gallery/collection_export/release_deck
+```
+
+## Unified Release Build
+
+```bash
+python -m waveforge_studio.cli release-build runs --out runs/release_build --title "Golden Signal Release" --include-tag has-zip
+python -m waveforge_studio.cli release-build-validate runs/release_build/release_build_manifest.json
+
+python -m waveforge_studio.cli forge "Release Build Demo One" --out runs/release_build_demo_one --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+python -m waveforge_studio.cli forge "Release Build Demo Two" --out runs/release_build_demo_two --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+python -m waveforge_studio.cli release-build runs --out runs/release_build --title "Golden Signal Release" --include-tag has-zip
+```
