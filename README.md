@@ -214,3 +214,11 @@ python -m waveforge_studio.cli zip-certificate-bundle runs/release_build/certifi
 python -m waveforge_studio.cli certificate-bundle-zip-validate runs/release_build/certificate_bundle/certificate_bundle_zip_manifest.json
 python -m waveforge_studio.cli release-build runs --out runs/release_build_bundle_zip --title "Golden Signal Release" --include-tag has-zip --zip --verify --certify --certificate-bundle --certificate-bundle-zip
 ```
+
+## Release Build Index Page
+
+```bash
+python -m waveforge_studio.cli release-build-index runs/release_build
+python -m waveforge_studio.cli release-build-index-validate runs/release_build/release_build_index_manifest.json
+python -m waveforge_studio.cli release-build runs --out runs/release_build_indexed --title "Golden Signal Release" --include-tag has-zip --zip --verify --certify --certificate-bundle --certificate-bundle-zip --index
+```

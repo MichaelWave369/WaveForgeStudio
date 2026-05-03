@@ -33,3 +33,5 @@
 - v2.6-alpha Certificate Bundle
 
 - v2.7-alpha Certificate Bundle ZIP
+
+- v2.8-alpha Release Build Index Page

@@ -112,3 +112,8 @@ release certificate
 certificate bundle
   -> deterministic certificate bundle ZIP
   -> compact single-file proof archive
+
+release build artifacts
+  -> release build index page
+  -> operator launch page
+  -> links to deck/gallery/archive/proof
