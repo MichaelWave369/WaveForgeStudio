@@ -75,3 +75,8 @@ collection export pack
   -> alpha release deck
   -> offline HTML cards + Markdown deck
   -> showcase / presentation artifact
+
+alpha release deck
+  -> deterministic release deck ZIP
+  -> release deck ZIP manifest/receipt
+  -> share/archive showcase artifact

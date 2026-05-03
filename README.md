@@ -145,3 +145,18 @@ python -m waveforge_studio.cli collection runs/gallery/gallery_manifest.json --o
 python -m waveforge_studio.cli collection-export runs/gallery/collection/collection_manifest.json --out runs/gallery/collection_export
 python -m waveforge_studio.cli release-deck runs/gallery/collection_export/collection_export_manifest.json --out runs/gallery/collection_export/release_deck --title "Golden Signal Release Deck"
 ```
+
+## Deterministic Release Deck ZIP
+
+```bash
+python -m waveforge_studio.cli zip-release-deck runs/gallery/collection_export/release_deck
+python -m waveforge_studio.cli release-deck-zip-validate runs/gallery/collection_export/release_deck/release_deck_zip_manifest.json
+
+python -m waveforge_studio.cli forge "Deck Zip Demo One" --out runs/deck_zip_demo_one --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+python -m waveforge_studio.cli forge "Deck Zip Demo Two" --out runs/deck_zip_demo_two --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+python -m waveforge_studio.cli gallery runs --out runs/gallery
+python -m waveforge_studio.cli collection runs/gallery/gallery_manifest.json --out runs/gallery/collection --title "Golden Signal Release" --include-tag has-zip
+python -m waveforge_studio.cli collection-export runs/gallery/collection/collection_manifest.json --out runs/gallery/collection_export
+python -m waveforge_studio.cli release-deck runs/gallery/collection_export/collection_export_manifest.json --out runs/gallery/collection_export/release_deck --title "Golden Signal Release Deck"
+python -m waveforge_studio.cli zip-release-deck runs/gallery/collection_export/release_deck
+```

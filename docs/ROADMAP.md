@@ -19,3 +19,5 @@
 - v1.9-alpha Collection Export Pack
 
 - v2.0-alpha Alpha Release Deck
+
+- v2.1-alpha Deterministic Release Deck ZIP
