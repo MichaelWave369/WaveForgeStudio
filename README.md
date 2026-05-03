@@ -110,3 +110,11 @@ python -m waveforge_studio.cli gallery runs --out runs/gallery
 ```
 
 - searchable gallery with prompt/hash search and tag filtering
+
+## Gallery Collections
+
+```bash
+python -m waveforge_studio.cli collection runs/gallery/gallery_manifest.json --out runs/gallery/collection --title "Golden Signal Showcase"
+python -m waveforge_studio.cli collection runs/gallery/gallery_manifest.json --out runs/gallery/collection_ready --include-tag alpha-ready --include-tag has-zip
+python -m waveforge_studio.cli collection-validate runs/gallery/collection/collection_manifest.json
+```

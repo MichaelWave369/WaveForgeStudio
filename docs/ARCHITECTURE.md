@@ -59,3 +59,8 @@ multiple preview packs / ZIPs
   -> searchable local demo gallery
   -> tags / filters / hash search
   -> gallery manifest/receipt
+
+searchable gallery
+  -> curated collection manifest
+  -> collection index
+  -> showcase / playlist / release set

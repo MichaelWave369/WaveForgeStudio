@@ -13,3 +13,5 @@
 - v1.6-alpha Local Demo Gallery Index
 
 - v1.7-alpha Gallery Search + Tags
+
+- v1.8-alpha Gallery Collection Manifest
