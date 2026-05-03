@@ -1,0 +1,25 @@
+from __future__ import annotations
+
+REQUIRED_ALPHA_ARTIFACTS = [
+    "project.waveforge.json",
+    "audio_graph.json",
+    "visual_graph.json",
+    "sync_lattice.json",
+    "render_manifest.json",
+    "receipt.json",
+    "summary.md",
+    "av_timeline.json",
+    "renderer_handoff.json",
+    "timeline_preview.html",
+    "render_queue.json",
+    "execution_report.json",
+    "artifact_ledger.json",
+    "production_bundle.json",
+    "phiaudio/phiaudio_bundle.json",
+    "waverider/waverider_bundle.json",
+    "wavetalk/wavetalk_bundle.json",
+    "schema_registry.json",
+    "release_manifest.json",
+    "STUDIO_SEAL.md",
+    "forge_report.json",
+]
