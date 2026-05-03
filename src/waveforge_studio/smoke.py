@@ -12,6 +12,7 @@ from .version import DEFAULT_RELEASE_TIMESTAMP, PROJECT_NAME, RELEASE_NAME, __ve
 from .local_audio_renderer import render_audio_stub
 from .local_visual_renderer import render_visual_stub
 from .local_av_preview import render_av_preview
+from .preview_pack import write_preview_pack
 
 
 def run_golden_demo_smoke(
@@ -23,6 +24,7 @@ def run_golden_demo_smoke(
     render_audio: bool = False,
     render_visual: bool = False,
     av_preview: bool = False,
+    preview_pack: bool = False,
 ) -> dict:
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -31,6 +33,7 @@ def run_golden_demo_smoke(
     audio_manifest = render_audio_stub(packet, out) if render_audio else None
     visual_manifest = render_visual_stub(packet, out) if render_visual else None
     preview_manifest = render_av_preview(packet, out) if av_preview else None
+    pack_manifest = write_preview_pack(out) if preview_pack else None
     release_manifest = write_release_manifest(out, packet=packet)
     write_studio_seal(out, release_manifest)
     release_manifest = write_release_manifest(out, packet=packet)
@@ -53,6 +56,8 @@ def run_golden_demo_smoke(
         checks.append({"id": "check_008_local_visual_stub", "name": "Local visual storyboard rendered", "passed": (out / "render" / "storyboard" / "frame_001.svg").exists() and visual_manifest is not None})
     if av_preview:
         checks.append({"id": "check_009_local_av_preview", "name": "Local AV preview rendered", "passed": (out / "render" / "av_preview.html").exists() and preview_manifest is not None})
+    if preview_pack:
+        checks.append({"id": "check_010_preview_pack", "name": "Portable preview pack created", "passed": (out / "preview_pack" / "index.html").exists() and pack_manifest is not None})
 
     smoke_passed = all(c["passed"] for c in checks)
     report = {

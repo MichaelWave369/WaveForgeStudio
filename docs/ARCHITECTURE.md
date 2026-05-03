@@ -36,3 +36,11 @@ local audio stub + local visual storyboard
   -> local AV preview page
   -> preview manifest/receipt
   -> artifact ledger
+
+
+## Portable Pack Stage
+
+local AV preview page
+  -> portable preview pack
+  -> pack manifest/receipt
+  -> share/archive folder
