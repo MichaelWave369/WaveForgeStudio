@@ -160,3 +160,14 @@ python -m waveforge_studio.cli collection-export runs/gallery/collection/collect
 python -m waveforge_studio.cli release-deck runs/gallery/collection_export/collection_export_manifest.json --out runs/gallery/collection_export/release_deck --title "Golden Signal Release Deck"
 python -m waveforge_studio.cli zip-release-deck runs/gallery/collection_export/release_deck
 ```
+
+## Unified Release Build
+
+```bash
+python -m waveforge_studio.cli release-build runs --out runs/release_build --title "Golden Signal Release" --include-tag has-zip
+python -m waveforge_studio.cli release-build-validate runs/release_build/release_build_manifest.json
+
+python -m waveforge_studio.cli forge "Release Build Demo One" --out runs/release_build_demo_one --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+python -m waveforge_studio.cli forge "Release Build Demo Two" --out runs/release_build_demo_two --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+python -m waveforge_studio.cli release-build runs --out runs/release_build --title "Golden Signal Release" --include-tag has-zip
+```

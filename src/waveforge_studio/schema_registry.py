@@ -34,6 +34,8 @@ _SCHEMAS = [
 ("waveforge.release_deck_receipt.v2_alpha","v2_alpha","release deck receipt","release_deck_receipt.json"),
 ("waveforge.release_deck_zip_manifest.v2_alpha","v2_alpha","release deck zip manifest","release_deck_zip_manifest.json"),
 ("waveforge.release_deck_zip_receipt.v2_alpha","v2_alpha","release deck zip receipt","release_deck_zip_receipt.json"),
+("waveforge.release_build_manifest.v2_alpha","v2_alpha","release build manifest","release_build_manifest.json"),
+("waveforge.release_build_receipt.v2_alpha","v2_alpha","release build receipt","release_build_receipt.json"),
 ]
 
 def list_schemas() -> list[dict]:

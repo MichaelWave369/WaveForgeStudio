@@ -25,6 +25,7 @@ from .gallery_collection import write_gallery_collection, validate_gallery_colle
 from .collection_export import write_collection_export, validate_collection_export_manifest
 from .release_deck import write_release_deck, validate_release_deck_manifest
 from .release_deck_zip import write_release_deck_zip, validate_release_deck_zip_manifest
+from .release_build import write_release_build, validate_release_build_manifest
 from .smoke import write_golden_demo_smoke
 from .timeline_preview import write_timeline_preview
 from .av_timeline import write_av_timeline, validate_av_timeline
@@ -220,6 +221,18 @@ def release_deck_zip_validate_command(a):
     print('VALID release deck zip manifest' if not e else 'INVALID release deck zip manifest')
     return 0 if not e else 1
 
+
+def release_build_command(a):
+    m=write_release_build(a.runs_root,a.out,title=a.title,description=a.description,include_tags=a.include_tag,exclude_tags=a.exclude_tag,include_run_paths=a.include_run)
+    e=validate_release_build_manifest(m)
+    print(json.dumps({"build_path": str(Path(a.out) if a.out else Path(a.runs_root)/"release_build"), "title": m["title"], "discovered_runs": m["counts"]["discovered_runs"], "selected_runs": m["counts"]["selected_runs"], "zip_count": m["counts"]["zip_count"], "missing_zip_count": m["counts"]["missing_zip_count"], "deck_card_count": m["counts"]["deck_cards"], "release_deck_zip": m["outputs"]["release_deck_zip"], "release_build_hash": m["receipt"]["release_build_hash"]}, indent=2, sort_keys=True))
+    return 0 if not e else 1
+
+def release_build_validate_command(a):
+    m=json.loads(Path(a.path).read_text(encoding='utf-8')); e=validate_release_build_manifest(m)
+    print('VALID release build manifest' if not e else 'INVALID release build manifest')
+    return 0 if not e else 1
+
 def doctor_command(a):
     cmd_summary = ["version","schemas","forge","release","smoke","doctor","compile","validate","inspect","adapters","timeline","timeline-validate","handoff","handoff-validate","queue","queue-validate","run-queue","ledger","bundle","preview","export-phiaudio","export-waverider","export-wavetalk"]
     report = {
@@ -332,6 +345,8 @@ def build_parser():
     rdv=sub.add_parser('release-deck-validate'); rdv.add_argument('path'); rdv.set_defaults(func=release_deck_validate_command)
     zrd=sub.add_parser('zip-release-deck'); zrd.add_argument('path'); zrd.add_argument('--out'); zrd.set_defaults(func=zip_release_deck_command)
     zrdv=sub.add_parser('release-deck-zip-validate'); zrdv.add_argument('path'); zrdv.set_defaults(func=release_deck_zip_validate_command)
+    rb=sub.add_parser('release-build'); rb.add_argument('runs_root'); rb.add_argument('--out'); rb.add_argument('--title', default='WaveForgeStudio Release Build'); rb.add_argument('--description', default=''); rb.add_argument('--include-tag', action='append'); rb.add_argument('--exclude-tag', action='append'); rb.add_argument('--include-run', action='append'); rb.set_defaults(func=release_build_command)
+    rbv=sub.add_parser('release-build-validate'); rbv.add_argument('path'); rbv.set_defaults(func=release_build_validate_command)
     c=sub.add_parser('compile'); c.add_argument('prompt'); c.add_argument('--duration',type=int,default=72); c.add_argument('--seed',type=int,default=369369); c.add_argument('--mode',default='mythic-reel'); c.add_argument('--out',required=True); c.add_argument('--export-phiaudio',action='store_true'); c.add_argument('--export-waverider',action='store_true'); c.add_argument('--export-wavetalk',action='store_true'); c.add_argument('--preview',action='store_true'); c.add_argument('--timeline',action='store_true'); c.add_argument('--handoff',action='store_true'); c.add_argument('--bundle',action='store_true'); c.add_argument('--queue',action='store_true'); c.add_argument('--run-queue',action='store_true'); c.set_defaults(func=compile_command)
     for n,f,o in [('validate',validate_command,False),('inspect',inspect_command,False),('adapters',adapters_command,False),('timeline-validate',timeline_validate_command,False),('handoff-validate',handoff_validate_command,False),('queue-validate',queue_validate_command,False),('ledger',ledger_command,False),('export-phiaudio',export_phiaudio_command,True),('export-waverider',export_waverider_command,True),('export-wavetalk',export_wavetalk_command,True),('preview',preview_command,True),('timeline',timeline_command,True),('handoff',handoff_command,True),('queue',queue_command,True),('run-queue',run_queue_command,True),('bundle',bundle_command,True)]:
         p=sub.add_parser(n); p.add_argument('path');

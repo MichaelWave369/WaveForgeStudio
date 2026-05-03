@@ -80,3 +80,11 @@ alpha release deck
   -> deterministic release deck ZIP
   -> release deck ZIP manifest/receipt
   -> share/archive showcase artifact
+
+runs root
+  -> gallery
+  -> collection
+  -> collection export
+  -> release deck
+  -> release deck ZIP
+  -> unified release build manifest/receipt
