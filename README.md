@@ -222,3 +222,13 @@ python -m waveforge_studio.cli release-build-index runs/release_build
 python -m waveforge_studio.cli release-build-index-validate runs/release_build/release_build_index_manifest.json
 python -m waveforge_studio.cli release-build runs --out runs/release_build_indexed --title "Golden Signal Release" --include-tag has-zip --zip --verify --certify --certificate-bundle --certificate-bundle-zip --index
 ```
+
+## Final Release
+
+```bash
+python -m waveforge_studio.cli finalize-release runs --out runs/final_release --title "Golden Signal Release" --include-tag has-zip
+python -m waveforge_studio.cli final-release-validate runs/final_release/final_release_manifest.json
+python -m waveforge_studio.cli forge "Final Release Demo One" --out runs/final_release_demo_one --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+python -m waveforge_studio.cli forge "Final Release Demo Two" --out runs/final_release_demo_two --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+python -m waveforge_studio.cli finalize-release runs --out runs/final_release --title "Golden Signal Release" --include-tag has-zip
+```

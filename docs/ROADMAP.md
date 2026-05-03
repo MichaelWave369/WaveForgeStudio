@@ -35,3 +35,5 @@
 - v2.7-alpha Certificate Bundle ZIP
 
 - v2.8-alpha Release Build Index Page
+
+- v2.9-alpha Release Build Finalizer

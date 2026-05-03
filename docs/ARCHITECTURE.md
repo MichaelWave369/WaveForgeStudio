@@ -117,3 +117,10 @@ release build artifacts
   -> release build index page
   -> operator launch page
   -> links to deck/gallery/archive/proof
+
+runs root
+  -> finalize-release
+  -> release_build.zip
+  -> certificate_bundle.zip
+  -> index.html
+  -> final release manifest/receipt
