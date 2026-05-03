@@ -28,6 +28,7 @@ from .release_deck_zip import write_release_deck_zip, validate_release_deck_zip_
 from .release_build import write_release_build, validate_release_build_manifest
 from .release_build_zip import write_release_build_zip, validate_release_build_zip_manifest
 from .release_build_verification import write_release_build_verification, validate_release_build_verification
+from .release_certificate import write_release_certificate, validate_release_certificate
 from .smoke import write_golden_demo_smoke
 from .timeline_preview import write_timeline_preview
 from .av_timeline import write_av_timeline, validate_av_timeline
@@ -230,6 +231,8 @@ def release_build_command(a):
         write_release_build_zip(Path(a.out) if a.out else Path(a.runs_root)/"release_build")
     if getattr(a, "verify", False):
         write_release_build_verification(Path(a.out) if a.out else Path(a.runs_root)/"release_build", strict=False)
+    if getattr(a, "certify", False):
+        write_release_certificate(Path(a.out) if a.out else Path(a.runs_root)/"release_build", require_passed=False)
     e=validate_release_build_manifest(m)
     print(json.dumps({"build_path": str(Path(a.out) if a.out else Path(a.runs_root)/"release_build"), "title": m["title"], "discovered_runs": m["counts"]["discovered_runs"], "selected_runs": m["counts"]["selected_runs"], "zip_count": m["counts"]["zip_count"], "missing_zip_count": m["counts"]["missing_zip_count"], "deck_card_count": m["counts"]["deck_cards"], "release_deck_zip": m["outputs"]["release_deck_zip"], "release_build_hash": m["receipt"]["release_build_hash"]}, indent=2, sort_keys=True))
     return 0 if not e else 1
@@ -258,6 +261,18 @@ def verify_release_build_command(a):
 def release_build_verification_validate_command(a):
     m=json.loads(Path(a.path).read_text(encoding='utf-8')); e=validate_release_build_verification(m)
     print('VALID release build verification report' if not e else 'INVALID release build verification report')
+    return 0 if not e else 1
+
+def certify_release_build_command(a):
+    c=write_release_certificate(a.path, require_passed=getattr(a, "require_passed", False))
+    e=validate_release_certificate(c)
+    print(json.dumps({"build_path": str(a.path), "certificate_status": c["certificate_status"], "verification_passed": c["verification"]["passed"], "warning_count": c["verification"]["warning_count"], "error_count": c["verification"]["error_count"], "release_build_zip_sha256": c["hashes"]["release_build_zip_sha256"], "release_certificate_hash": c["receipt"]["release_certificate_hash"]}, indent=2, sort_keys=True))
+    if e: return 1
+    return 1 if getattr(a, "require_passed", False) and not c["verification"]["passed"] else 0
+
+def release_certificate_validate_command(a):
+    c=json.loads(Path(a.path).read_text(encoding='utf-8')); e=validate_release_certificate(c)
+    print('VALID release certificate' if not e else 'INVALID release certificate')
     return 0 if not e else 1
 
 def doctor_command(a):
@@ -372,12 +387,14 @@ def build_parser():
     rdv=sub.add_parser('release-deck-validate'); rdv.add_argument('path'); rdv.set_defaults(func=release_deck_validate_command)
     zrd=sub.add_parser('zip-release-deck'); zrd.add_argument('path'); zrd.add_argument('--out'); zrd.set_defaults(func=zip_release_deck_command)
     zrdv=sub.add_parser('release-deck-zip-validate'); zrdv.add_argument('path'); zrdv.set_defaults(func=release_deck_zip_validate_command)
-    rb=sub.add_parser('release-build'); rb.add_argument('runs_root'); rb.add_argument('--out'); rb.add_argument('--title', default='WaveForgeStudio Release Build'); rb.add_argument('--description', default=''); rb.add_argument('--include-tag', action='append'); rb.add_argument('--exclude-tag', action='append'); rb.add_argument('--include-run', action='append'); rb.add_argument('--zip', action='store_true'); rb.add_argument('--verify', action='store_true'); rb.set_defaults(func=release_build_command)
+    rb=sub.add_parser('release-build'); rb.add_argument('runs_root'); rb.add_argument('--out'); rb.add_argument('--title', default='WaveForgeStudio Release Build'); rb.add_argument('--description', default=''); rb.add_argument('--include-tag', action='append'); rb.add_argument('--exclude-tag', action='append'); rb.add_argument('--include-run', action='append'); rb.add_argument('--zip', action='store_true'); rb.add_argument('--verify', action='store_true'); rb.add_argument('--certify', action='store_true'); rb.set_defaults(func=release_build_command)
     rbv=sub.add_parser('release-build-validate'); rbv.add_argument('path'); rbv.set_defaults(func=release_build_validate_command)
     zrb=sub.add_parser('zip-release-build'); zrb.add_argument('path'); zrb.add_argument('--out'); zrb.set_defaults(func=zip_release_build_command)
     zrbv=sub.add_parser('release-build-zip-validate'); zrbv.add_argument('path'); zrbv.set_defaults(func=release_build_zip_validate_command)
     vrb=sub.add_parser('verify-release-build'); vrb.add_argument('path'); vrb.add_argument('--strict', action='store_true'); vrb.set_defaults(func=verify_release_build_command)
     vrbv=sub.add_parser('release-build-verification-validate'); vrbv.add_argument('path'); vrbv.set_defaults(func=release_build_verification_validate_command)
+    crb=sub.add_parser('certify-release-build'); crb.add_argument('path'); crb.add_argument('--require-passed', action='store_true'); crb.set_defaults(func=certify_release_build_command)
+    crbv=sub.add_parser('release-certificate-validate'); crbv.add_argument('path'); crbv.set_defaults(func=release_certificate_validate_command)
     c=sub.add_parser('compile'); c.add_argument('prompt'); c.add_argument('--duration',type=int,default=72); c.add_argument('--seed',type=int,default=369369); c.add_argument('--mode',default='mythic-reel'); c.add_argument('--out',required=True); c.add_argument('--export-phiaudio',action='store_true'); c.add_argument('--export-waverider',action='store_true'); c.add_argument('--export-wavetalk',action='store_true'); c.add_argument('--preview',action='store_true'); c.add_argument('--timeline',action='store_true'); c.add_argument('--handoff',action='store_true'); c.add_argument('--bundle',action='store_true'); c.add_argument('--queue',action='store_true'); c.add_argument('--run-queue',action='store_true'); c.set_defaults(func=compile_command)
     for n,f,o in [('validate',validate_command,False),('inspect',inspect_command,False),('adapters',adapters_command,False),('timeline-validate',timeline_validate_command,False),('handoff-validate',handoff_validate_command,False),('queue-validate',queue_validate_command,False),('ledger',ledger_command,False),('export-phiaudio',export_phiaudio_command,True),('export-waverider',export_waverider_command,True),('export-wavetalk',export_wavetalk_command,True),('preview',preview_command,True),('timeline',timeline_command,True),('handoff',handoff_command,True),('queue',queue_command,True),('run-queue',run_queue_command,True),('bundle',bundle_command,True)]:
         p=sub.add_parser(n); p.add_argument('path');

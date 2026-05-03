@@ -188,3 +188,12 @@ python -m waveforge_studio.cli verify-release-build runs/release_build_zip_verif
 python -m waveforge_studio.cli release-build-verification-validate runs/release_build_zip_verify/release_build_verification.json
 python -m waveforge_studio.cli release-build runs --out runs/release_build_zip_verify --title "Golden Signal Release" --include-tag has-zip --zip --verify
 ```
+
+## Release Certificate
+
+```bash
+python -m waveforge_studio.cli certify-release-build runs/release_build_zip_verify
+python -m waveforge_studio.cli certify-release-build runs/release_build_zip_verify --require-passed
+python -m waveforge_studio.cli release-certificate-validate runs/release_build_zip_verify/release_certificate.json
+python -m waveforge_studio.cli release-build runs --out runs/release_build_certified --title "Golden Signal Release" --include-tag has-zip --zip --verify --certify
+```

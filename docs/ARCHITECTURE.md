@@ -98,3 +98,8 @@ release build ZIP
   -> release build verification report
   -> verification receipt
   -> local auditor seal
+
+release build verification report
+  -> release certificate
+  -> certificate receipt
+  -> human-readable integrity certificate
