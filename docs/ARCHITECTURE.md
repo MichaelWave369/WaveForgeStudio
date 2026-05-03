@@ -44,3 +44,39 @@ local AV preview page
   -> portable preview pack
   -> pack manifest/receipt
   -> share/archive folder
+
+portable preview pack
+  -> deterministic preview pack ZIP
+  -> ZIP manifest/receipt
+  -> share/archive artifact
+
+multiple preview packs / ZIPs
+  -> local demo gallery
+  -> gallery manifest/receipt
+  -> archive browser
+
+multiple preview packs / ZIPs
+  -> searchable local demo gallery
+  -> tags / filters / hash search
+  -> gallery manifest/receipt
+
+searchable gallery
+  -> curated collection manifest
+  -> collection index
+  -> showcase / playlist / release set
+
+curated collection manifest
+  -> portable collection export
+  -> selected preview ZIPs
+  -> collection export manifest/receipt
+  -> share/archive release pack
+
+collection export pack
+  -> alpha release deck
+  -> offline HTML cards + Markdown deck
+  -> showcase / presentation artifact
+
+alpha release deck
+  -> deterministic release deck ZIP
+  -> release deck ZIP manifest/receipt
+  -> share/archive showcase artifact
