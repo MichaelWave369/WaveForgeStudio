@@ -55,3 +55,15 @@ python -m waveforge_studio.cli audio-render-validate runs/golden_demo/audio_rend
 python -m waveforge_studio.cli forge "The Sovereign Signal awakens across the infinite fractal wave." --out runs/golden_demo_audio --render-audio-stub
 python -m waveforge_studio.cli smoke --out runs/golden_demo_smoke_audio --render-audio-stub
 ```
+
+
+## Local Visual Storyboard Render Stub
+
+```bash
+python -m waveforge_studio.cli render-visual-stub runs/golden_demo/project.waveforge.json --out runs/golden_demo
+python -m waveforge_studio.cli visual-render-validate runs/golden_demo/visual_render_manifest.json
+python -m waveforge_studio.cli forge "The Sovereign Signal awakens across the infinite fractal wave." --out runs/golden_demo_visual --render-visual-stub
+python -m waveforge_studio.cli forge "The Sovereign Signal awakens across the infinite fractal wave." --out runs/golden_demo_av --render-audio-stub --render-visual-stub
+python -m waveforge_studio.cli smoke --out runs/golden_demo_smoke_visual --render-visual-stub
+python -m waveforge_studio.cli smoke --out runs/golden_demo_smoke_av --render-audio-stub --render-visual-stub
+```

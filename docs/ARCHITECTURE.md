@@ -19,3 +19,12 @@ AV timeline / renderer handoff
   -> WAV placeholders
   -> audio render receipt
   -> artifact ledger
+
+
+## First Safe Local Visual Artifact Stage
+
+AV timeline / renderer handoff
+  -> local visual storyboard render stub
+  -> SVG storyboard frames
+  -> visual render receipt
+  -> artifact ledger
