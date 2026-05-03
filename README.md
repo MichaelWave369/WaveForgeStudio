@@ -88,3 +88,33 @@ python -m waveforge_studio.cli preview-pack-validate runs/golden_demo_full_previ
 python -m waveforge_studio.cli forge "The Sovereign Signal awakens across the infinite fractal wave." --out runs/golden_demo_pack --render-audio-stub --render-visual-stub --av-preview --preview-pack
 python -m waveforge_studio.cli smoke --out runs/golden_demo_smoke_pack --render-audio-stub --render-visual-stub --av-preview --preview-pack
 ```
+
+## Deterministic Preview Pack ZIP
+
+```bash
+python -m waveforge_studio.cli zip-preview-pack runs/golden_demo_pack/preview_pack
+python -m waveforge_studio.cli preview-pack-zip-validate runs/golden_demo_pack/preview_pack/preview_pack_zip_manifest.json
+python -m waveforge_studio.cli forge "The Sovereign Signal awakens across the infinite fractal wave." --out runs/golden_demo_zip --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+python -m waveforge_studio.cli smoke --out runs/golden_demo_smoke_zip --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+```
+
+## Local Demo Gallery
+
+```bash
+python -m waveforge_studio.cli gallery runs --out runs/gallery
+python -m waveforge_studio.cli gallery-validate runs/gallery/gallery_manifest.json
+
+python -m waveforge_studio.cli forge "Demo one" --out runs/demo_one --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+python -m waveforge_studio.cli forge "Demo two" --out runs/demo_two --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+python -m waveforge_studio.cli gallery runs --out runs/gallery
+```
+
+- searchable gallery with prompt/hash search and tag filtering
+
+## Gallery Collections
+
+```bash
+python -m waveforge_studio.cli collection runs/gallery/gallery_manifest.json --out runs/gallery/collection --title "Golden Signal Showcase"
+python -m waveforge_studio.cli collection runs/gallery/gallery_manifest.json --out runs/gallery/collection_ready --include-tag alpha-ready --include-tag has-zip
+python -m waveforge_studio.cli collection-validate runs/gallery/collection/collection_manifest.json
+```
