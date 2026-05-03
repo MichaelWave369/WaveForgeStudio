@@ -7,3 +7,9 @@
 - v1.2-alpha Local Storyboard Render Stub
 - v1.3-alpha Local AV Preview Page
 - v1.4-alpha Portable Preview Export Pack
+
+- v1.5-alpha Deterministic Preview Pack ZIP Export
+
+- v1.6-alpha Local Demo Gallery Index
+
+- v1.7-alpha Gallery Search + Tags
