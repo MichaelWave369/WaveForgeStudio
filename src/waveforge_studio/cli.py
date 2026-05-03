@@ -20,6 +20,7 @@ from .local_visual_renderer import render_visual_stub, validate_visual_render_ma
 from .local_av_preview import render_av_preview, validate_av_preview_manifest
 from .preview_pack import write_preview_pack, validate_preview_pack_manifest
 from .preview_pack_zip import write_preview_pack_zip, validate_preview_pack_zip_manifest
+from .demo_gallery import write_demo_gallery, validate_gallery_manifest
 from .smoke import write_golden_demo_smoke
 from .timeline_preview import write_timeline_preview
 from .av_timeline import write_av_timeline, validate_av_timeline
@@ -154,6 +155,19 @@ def preview_pack_zip_validate_command(a):
     print('VALID preview pack zip manifest' if not e else 'INVALID preview pack zip manifest')
     return 0 if not e else 1
 
+
+def gallery_command(a):
+    out = a.out or str(Path(a.root_dir)/"gallery")
+    m = write_demo_gallery(a.root_dir, out)
+    e = validate_gallery_manifest(m)
+    print(json.dumps({"gallery_path": out, "run_count": m["run_count"], "ready_count": m["ready_count"], "smoke_passed_count": m["smoke_passed_count"], "zip_count": m["zip_count"], "gallery_hash": m["receipt"]["gallery_hash"]}, indent=2, sort_keys=True))
+    return 0 if not e else 1
+
+def gallery_validate_command(a):
+    m=json.loads(Path(a.path).read_text(encoding='utf-8')); e=validate_gallery_manifest(m)
+    print('VALID gallery manifest' if not e else 'INVALID gallery manifest')
+    return 0 if not e else 1
+
 def doctor_command(a):
     cmd_summary = ["version","schemas","forge","release","smoke","doctor","compile","validate","inspect","adapters","timeline","timeline-validate","handoff","handoff-validate","queue","queue-validate","run-queue","ledger","bundle","preview","export-phiaudio","export-waverider","export-wavetalk"]
     report = {
@@ -256,6 +270,8 @@ def build_parser():
     ppv=sub.add_parser('preview-pack-validate'); ppv.add_argument('path'); ppv.set_defaults(func=preview_pack_validate_command)
     zpp=sub.add_parser('zip-preview-pack'); zpp.add_argument('path'); zpp.add_argument('--out'); zpp.set_defaults(func=zip_preview_pack_command)
     zppv=sub.add_parser('preview-pack-zip-validate'); zppv.add_argument('path'); zppv.set_defaults(func=preview_pack_zip_validate_command)
+    gal=sub.add_parser('gallery'); gal.add_argument('root_dir'); gal.add_argument('--out'); gal.set_defaults(func=gallery_command)
+    galv=sub.add_parser('gallery-validate'); galv.add_argument('path'); galv.set_defaults(func=gallery_validate_command)
     c=sub.add_parser('compile'); c.add_argument('prompt'); c.add_argument('--duration',type=int,default=72); c.add_argument('--seed',type=int,default=369369); c.add_argument('--mode',default='mythic-reel'); c.add_argument('--out',required=True); c.add_argument('--export-phiaudio',action='store_true'); c.add_argument('--export-waverider',action='store_true'); c.add_argument('--export-wavetalk',action='store_true'); c.add_argument('--preview',action='store_true'); c.add_argument('--timeline',action='store_true'); c.add_argument('--handoff',action='store_true'); c.add_argument('--bundle',action='store_true'); c.add_argument('--queue',action='store_true'); c.add_argument('--run-queue',action='store_true'); c.set_defaults(func=compile_command)
     for n,f,o in [('validate',validate_command,False),('inspect',inspect_command,False),('adapters',adapters_command,False),('timeline-validate',timeline_validate_command,False),('handoff-validate',handoff_validate_command,False),('queue-validate',queue_validate_command,False),('ledger',ledger_command,False),('export-phiaudio',export_phiaudio_command,True),('export-waverider',export_waverider_command,True),('export-wavetalk',export_wavetalk_command,True),('preview',preview_command,True),('timeline',timeline_command,True),('handoff',handoff_command,True),('queue',queue_command,True),('run-queue',run_queue_command,True),('bundle',bundle_command,True)]:
         p=sub.add_parser(n); p.add_argument('path');

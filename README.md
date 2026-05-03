@@ -97,3 +97,14 @@ python -m waveforge_studio.cli preview-pack-zip-validate runs/golden_demo_pack/p
 python -m waveforge_studio.cli forge "The Sovereign Signal awakens across the infinite fractal wave." --out runs/golden_demo_zip --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
 python -m waveforge_studio.cli smoke --out runs/golden_demo_smoke_zip --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
 ```
+
+## Local Demo Gallery
+
+```bash
+python -m waveforge_studio.cli gallery runs --out runs/gallery
+python -m waveforge_studio.cli gallery-validate runs/gallery/gallery_manifest.json
+
+python -m waveforge_studio.cli forge "Demo one" --out runs/demo_one --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+python -m waveforge_studio.cli forge "Demo two" --out runs/demo_two --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+python -m waveforge_studio.cli gallery runs --out runs/gallery
+```

@@ -49,3 +49,8 @@ portable preview pack
   -> deterministic preview pack ZIP
   -> ZIP manifest/receipt
   -> share/archive artifact
+
+multiple preview packs / ZIPs
+  -> local demo gallery
+  -> gallery manifest/receipt
+  -> archive browser

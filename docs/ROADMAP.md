@@ -9,3 +9,5 @@
 - v1.4-alpha Portable Preview Export Pack
 
 - v1.5-alpha Deterministic Preview Pack ZIP Export
+
+- v1.6-alpha Local Demo Gallery Index
