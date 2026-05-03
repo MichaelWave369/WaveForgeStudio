@@ -28,3 +28,11 @@ AV timeline / renderer handoff
   -> SVG storyboard frames
   -> visual render receipt
   -> artifact ledger
+
+
+## First Local Operator Preview Stage
+
+local audio stub + local visual storyboard
+  -> local AV preview page
+  -> preview manifest/receipt
+  -> artifact ledger

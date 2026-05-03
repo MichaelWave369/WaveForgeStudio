@@ -67,3 +67,14 @@ python -m waveforge_studio.cli forge "The Sovereign Signal awakens across the in
 python -m waveforge_studio.cli smoke --out runs/golden_demo_smoke_visual --render-visual-stub
 python -m waveforge_studio.cli smoke --out runs/golden_demo_smoke_av --render-audio-stub --render-visual-stub
 ```
+
+
+## Local AV Preview Page
+
+```bash
+python -m waveforge_studio.cli preview-av runs/golden_demo/project.waveforge.json --out runs/golden_demo
+python -m waveforge_studio.cli av-preview-validate runs/golden_demo/av_preview_manifest.json
+python -m waveforge_studio.cli forge "The Sovereign Signal awakens across the infinite fractal wave." --out runs/golden_demo_preview --av-preview
+python -m waveforge_studio.cli forge "The Sovereign Signal awakens across the infinite fractal wave." --out runs/golden_demo_full_preview --render-audio-stub --render-visual-stub --av-preview
+python -m waveforge_studio.cli smoke --out runs/golden_demo_smoke_preview --render-audio-stub --render-visual-stub --av-preview
+```

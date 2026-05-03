@@ -11,6 +11,7 @@ from .studio_seal import write_studio_seal
 from .version import DEFAULT_RELEASE_TIMESTAMP, PROJECT_NAME, RELEASE_NAME, __version__
 from .local_audio_renderer import render_audio_stub
 from .local_visual_renderer import render_visual_stub
+from .local_av_preview import render_av_preview
 
 
 def run_golden_demo_smoke(
@@ -21,6 +22,7 @@ def run_golden_demo_smoke(
     mode: str = "mythic-reel",
     render_audio: bool = False,
     render_visual: bool = False,
+    av_preview: bool = False,
 ) -> dict:
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
@@ -28,6 +30,7 @@ def run_golden_demo_smoke(
     packet = json.loads((out / "project.waveforge.json").read_text(encoding="utf-8"))
     audio_manifest = render_audio_stub(packet, out) if render_audio else None
     visual_manifest = render_visual_stub(packet, out) if render_visual else None
+    preview_manifest = render_av_preview(packet, out) if av_preview else None
     release_manifest = write_release_manifest(out, packet=packet)
     write_studio_seal(out, release_manifest)
     release_manifest = write_release_manifest(out, packet=packet)
@@ -48,6 +51,8 @@ def run_golden_demo_smoke(
         checks.append({"id": "check_007_local_audio_stub", "name": "Local audio stub rendered", "passed": (out / "render" / "audio_mix.wav").exists() and audio_manifest is not None})
     if render_visual:
         checks.append({"id": "check_008_local_visual_stub", "name": "Local visual storyboard rendered", "passed": (out / "render" / "storyboard" / "frame_001.svg").exists() and visual_manifest is not None})
+    if av_preview:
+        checks.append({"id": "check_009_local_av_preview", "name": "Local AV preview rendered", "passed": (out / "render" / "av_preview.html").exists() and preview_manifest is not None})
 
     smoke_passed = all(c["passed"] for c in checks)
     report = {

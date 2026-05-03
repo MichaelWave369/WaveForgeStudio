@@ -17,6 +17,7 @@ from .render_queue import validate_render_queue, write_render_queue
 from .schema_registry import list_schemas
 from .local_audio_renderer import render_audio_stub, validate_audio_render_manifest
 from .local_visual_renderer import render_visual_stub, validate_visual_render_manifest
+from .local_av_preview import render_av_preview, validate_av_preview_manifest
 from .smoke import write_golden_demo_smoke
 from .timeline_preview import write_timeline_preview
 from .av_timeline import write_av_timeline, validate_av_timeline
@@ -54,6 +55,8 @@ def forge_command(a):
         render_audio_stub(packet, a.out); rendered = True
     if getattr(a, "render_visual_stub", False):
         render_visual_stub(packet, a.out); rendered = True
+    if getattr(a, "av_preview", False):
+        render_av_preview(packet, a.out); rendered = True
     if rendered:
         write_release_manifest(a.out, packet)
     return 0
@@ -72,7 +75,7 @@ def schemas_command(a):
     print(json.dumps({"schema": "waveforge.schema_registry.v1_alpha", "schemas": list_schemas()}, indent=2, sort_keys=True)); return 0
 
 def smoke_command(a):
-    rep = write_golden_demo_smoke(a.out, prompt=a.prompt, duration_seconds=a.duration, seed=a.seed, mode=a.mode, render_audio=getattr(a, "render_audio_stub", False), render_visual=getattr(a, "render_visual_stub", False))
+    rep = write_golden_demo_smoke(a.out, prompt=a.prompt, duration_seconds=a.duration, seed=a.seed, mode=a.mode, render_audio=getattr(a, "render_audio_stub", False), render_visual=getattr(a, "render_visual_stub", False), av_preview=getattr(a, "av_preview", False))
     print(json.dumps({"out": str(a.out), "smoke_passed": rep['smoke_passed'], "alpha_ready": rep['alpha_ready'], "release_hash": rep['release_hash'], "smoke_hash": rep['receipt']['smoke_hash']}, indent=2, sort_keys=True))
     return 0 if rep['smoke_passed'] else 1
 
@@ -101,6 +104,20 @@ def render_visual_stub_command(a):
 def visual_render_validate_command(a):
     m=json.loads(Path(a.path).read_text(encoding='utf-8')); e=validate_visual_render_manifest(m)
     print('VALID visual render manifest' if not e else 'INVALID visual render manifest')
+    return 0 if not e else 1
+
+
+def preview_av_command(a):
+    p,e=_load_valid(a.path)
+    if e: print('INVALID media packet'); return 1
+    m = render_av_preview(p, a.out)
+    print(json.dumps({"out": str(a.out), "preview_html": m["outputs"]["preview_html"], "audio_present": m["assets"]["audio_mix"]["present"], "frame_count": len(m["assets"]["storyboard_frames"]), "av_preview_hash": m["receipt"]["av_preview_hash"]}, indent=2, sort_keys=True))
+    return 0
+
+
+def av_preview_validate_command(a):
+    m=json.loads(Path(a.path).read_text(encoding='utf-8')); e=validate_av_preview_manifest(m)
+    print('VALID av preview manifest' if not e else 'INVALID av preview manifest')
     return 0 if not e else 1
 
 
@@ -192,14 +209,16 @@ def build_parser():
     parser=argparse.ArgumentParser(prog='waveforge-studio'); sub=parser.add_subparsers(dest='command',required=True)
     v=sub.add_parser('version'); v.set_defaults(func=version_command)
     s=sub.add_parser('schemas'); s.set_defaults(func=schemas_command)
-    f=sub.add_parser('forge'); f.add_argument('prompt'); f.add_argument('--duration',type=int,default=72); f.add_argument('--seed',type=int,default=369369); f.add_argument('--mode',default='mythic-reel'); f.add_argument('--out',required=True); f.add_argument('--render-audio-stub',action='store_true'); f.add_argument('--render-visual-stub',action='store_true'); f.set_defaults(func=forge_command)
+    f=sub.add_parser('forge'); f.add_argument('prompt'); f.add_argument('--duration',type=int,default=72); f.add_argument('--seed',type=int,default=369369); f.add_argument('--mode',default='mythic-reel'); f.add_argument('--out',required=True); f.add_argument('--render-audio-stub',action='store_true'); f.add_argument('--render-visual-stub',action='store_true'); f.add_argument('--av-preview',action='store_true'); f.set_defaults(func=forge_command)
     r=sub.add_parser('release'); r.add_argument('path'); r.set_defaults(func=release_command)
-    sm=sub.add_parser('smoke'); sm.add_argument('--out',required=True); sm.add_argument('--prompt',default='The Sovereign Signal awakens across the infinite fractal wave.'); sm.add_argument('--duration',type=int,default=72); sm.add_argument('--seed',type=int,default=369369); sm.add_argument('--mode',default='mythic-reel'); sm.add_argument('--render-audio-stub',action='store_true'); sm.add_argument('--render-visual-stub',action='store_true'); sm.set_defaults(func=smoke_command)
+    sm=sub.add_parser('smoke'); sm.add_argument('--out',required=True); sm.add_argument('--prompt',default='The Sovereign Signal awakens across the infinite fractal wave.'); sm.add_argument('--duration',type=int,default=72); sm.add_argument('--seed',type=int,default=369369); sm.add_argument('--mode',default='mythic-reel'); sm.add_argument('--render-audio-stub',action='store_true'); sm.add_argument('--render-visual-stub',action='store_true'); sm.add_argument('--av-preview',action='store_true'); sm.set_defaults(func=smoke_command)
     d=sub.add_parser('doctor'); d.set_defaults(func=doctor_command)
     ra=sub.add_parser('render-audio-stub'); ra.add_argument('path'); ra.add_argument('--out',required=True); ra.add_argument('--max-duration',type=int,default=12); ra.add_argument('--sample-rate',type=int,default=48000); ra.set_defaults(func=render_audio_stub_command)
     arv=sub.add_parser('audio-render-validate'); arv.add_argument('path'); arv.set_defaults(func=audio_render_validate_command)
     rv=sub.add_parser('render-visual-stub'); rv.add_argument('path'); rv.add_argument('--out',required=True); rv.add_argument('--frame-count',type=int,default=9); rv.add_argument('--width',type=int,default=1280); rv.add_argument('--height',type=int,default=720); rv.set_defaults(func=render_visual_stub_command)
     vrv=sub.add_parser('visual-render-validate'); vrv.add_argument('path'); vrv.set_defaults(func=visual_render_validate_command)
+    pav=sub.add_parser('preview-av'); pav.add_argument('path'); pav.add_argument('--out',required=True); pav.set_defaults(func=preview_av_command)
+    pavv=sub.add_parser('av-preview-validate'); pavv.add_argument('path'); pavv.set_defaults(func=av_preview_validate_command)
     c=sub.add_parser('compile'); c.add_argument('prompt'); c.add_argument('--duration',type=int,default=72); c.add_argument('--seed',type=int,default=369369); c.add_argument('--mode',default='mythic-reel'); c.add_argument('--out',required=True); c.add_argument('--export-phiaudio',action='store_true'); c.add_argument('--export-waverider',action='store_true'); c.add_argument('--export-wavetalk',action='store_true'); c.add_argument('--preview',action='store_true'); c.add_argument('--timeline',action='store_true'); c.add_argument('--handoff',action='store_true'); c.add_argument('--bundle',action='store_true'); c.add_argument('--queue',action='store_true'); c.add_argument('--run-queue',action='store_true'); c.set_defaults(func=compile_command)
     for n,f,o in [('validate',validate_command,False),('inspect',inspect_command,False),('adapters',adapters_command,False),('timeline-validate',timeline_validate_command,False),('handoff-validate',handoff_validate_command,False),('queue-validate',queue_validate_command,False),('ledger',ledger_command,False),('export-phiaudio',export_phiaudio_command,True),('export-waverider',export_waverider_command,True),('export-wavetalk',export_wavetalk_command,True),('preview',preview_command,True),('timeline',timeline_command,True),('handoff',handoff_command,True),('queue',queue_command,True),('run-queue',run_queue_command,True),('bundle',bundle_command,True)]:
         p=sub.add_parser(n); p.add_argument('path');
