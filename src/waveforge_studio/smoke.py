@@ -9,6 +9,7 @@ from .hashing import sha256_digest
 from .release_manifest import write_release_manifest
 from .studio_seal import write_studio_seal
 from .version import DEFAULT_RELEASE_TIMESTAMP, PROJECT_NAME, RELEASE_NAME, __version__
+from .local_audio_renderer import render_audio_stub
 
 
 def run_golden_demo_smoke(
@@ -17,11 +18,13 @@ def run_golden_demo_smoke(
     duration_seconds: int = 72,
     seed: int = 369369,
     mode: str = "mythic-reel",
+    render_audio: bool = False,
 ) -> dict:
     out = Path(out_dir)
     out.mkdir(parents=True, exist_ok=True)
     forge_report = run_forge_workflow(prompt=prompt, out_dir=out, duration_seconds=duration_seconds, seed=seed, mode=mode)
     packet = json.loads((out / "project.waveforge.json").read_text(encoding="utf-8"))
+    audio_manifest = render_audio_stub(packet, out) if render_audio else None
     release_manifest = write_release_manifest(out, packet=packet)
     write_studio_seal(out, release_manifest)
     release_manifest = write_release_manifest(out, packet=packet)
@@ -38,6 +41,8 @@ def run_golden_demo_smoke(
         {"id": "check_005_forge_report", "name": "forge_report.json exists", "passed": "forge_report.json" in present_files},
         {"id": "check_006_required_artifacts", "name": "All required alpha artifacts are present", "passed": len(missing_artifacts) == 0},
     ]
+    if render_audio:
+        checks.append({"id": "check_007_local_audio_stub", "name": "Local audio stub rendered", "passed": (out / "render" / "audio_mix.wav").exists() and audio_manifest is not None})
 
     smoke_passed = all(c["passed"] for c in checks)
     report = {

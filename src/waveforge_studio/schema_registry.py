@@ -14,6 +14,8 @@ _SCHEMAS = [
 ("waveforge.artifact_ledger.v0","v0","artifact ledger","artifact_ledger.json"),
 ("waveforge.av_timeline.v0","v0","av timeline","av_timeline.json"),
 ("waveforge.renderer_handoff.v0","v0","renderer handoff","renderer_handoff.json"),
+("waveforge.local_audio_render_manifest.v1_alpha","v1_alpha","local audio render manifest","audio_render_manifest.json"),
+("waveforge.local_audio_render_receipt.v1_alpha","v1_alpha","local audio render receipt","audio_render_receipt.json"),
 ]
 
 def list_schemas() -> list[dict]:

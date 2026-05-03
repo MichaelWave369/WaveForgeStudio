@@ -45,3 +45,13 @@ If Makefile is available:
 ```bash
 make ci-local
 ```
+
+
+## Local Audio Render Stub
+
+```bash
+python -m waveforge_studio.cli render-audio-stub runs/golden_demo/project.waveforge.json --out runs/golden_demo
+python -m waveforge_studio.cli audio-render-validate runs/golden_demo/audio_render_manifest.json
+python -m waveforge_studio.cli forge "The Sovereign Signal awakens across the infinite fractal wave." --out runs/golden_demo_audio --render-audio-stub
+python -m waveforge_studio.cli smoke --out runs/golden_demo_smoke_audio --render-audio-stub
+```

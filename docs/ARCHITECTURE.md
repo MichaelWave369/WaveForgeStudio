@@ -10,3 +10,12 @@ Prompt
   -> safe runner
   -> artifact ledger
   -> future guarded render execution
+
+
+## First Safe Local Render Artifact Stage
+
+AV timeline / renderer handoff
+  -> local audio render stub
+  -> WAV placeholders
+  -> audio render receipt
+  -> artifact ledger
