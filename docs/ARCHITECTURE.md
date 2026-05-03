@@ -103,3 +103,8 @@ release build verification report
   -> release certificate
   -> certificate receipt
   -> human-readable integrity certificate
+
+release certificate
+  -> certificate bundle
+  -> compact proof packet
+  -> certificate bundle manifest/receipt

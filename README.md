@@ -197,3 +197,12 @@ python -m waveforge_studio.cli certify-release-build runs/release_build_zip_veri
 python -m waveforge_studio.cli release-certificate-validate runs/release_build_zip_verify/release_certificate.json
 python -m waveforge_studio.cli release-build runs --out runs/release_build_certified --title "Golden Signal Release" --include-tag has-zip --zip --verify --certify
 ```
+
+## Certificate Bundle
+
+```bash
+python -m waveforge_studio.cli certificate-bundle runs/release_build_certified
+python -m waveforge_studio.cli certificate-bundle runs/release_build_certified --include-zip-file
+python -m waveforge_studio.cli certificate-bundle-validate runs/release_build_certified/certificate_bundle/certificate_bundle_manifest.json
+python -m waveforge_studio.cli release-build runs --out runs/release_build_bundle --title "Golden Signal Release" --include-tag has-zip --zip --verify --certify --certificate-bundle
+```

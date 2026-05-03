@@ -29,3 +29,5 @@
 - v2.4-alpha Release Build Verification Report
 
 - v2.5-alpha Release Certificate
+
+- v2.6-alpha Certificate Bundle
