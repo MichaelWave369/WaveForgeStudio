@@ -44,3 +44,13 @@ local AV preview page
   -> portable preview pack
   -> pack manifest/receipt
   -> share/archive folder
+
+portable preview pack
+  -> deterministic preview pack ZIP
+  -> ZIP manifest/receipt
+  -> share/archive artifact
+
+multiple preview packs / ZIPs
+  -> local demo gallery
+  -> gallery manifest/receipt
+  -> archive browser
