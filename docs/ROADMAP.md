@@ -15,3 +15,5 @@
 - v1.7-alpha Gallery Search + Tags
 
 - v1.8-alpha Gallery Collection Manifest
+
+- v1.9-alpha Collection Export Pack

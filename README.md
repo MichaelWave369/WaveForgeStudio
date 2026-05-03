@@ -118,3 +118,16 @@ python -m waveforge_studio.cli collection runs/gallery/gallery_manifest.json --o
 python -m waveforge_studio.cli collection runs/gallery/gallery_manifest.json --out runs/gallery/collection_ready --include-tag alpha-ready --include-tag has-zip
 python -m waveforge_studio.cli collection-validate runs/gallery/collection/collection_manifest.json
 ```
+
+## Collection Export Pack
+
+```bash
+python -m waveforge_studio.cli collection-export runs/gallery/collection/collection_manifest.json --out runs/gallery/collection_export
+python -m waveforge_studio.cli collection-export-validate runs/gallery/collection_export/collection_export_manifest.json
+
+python -m waveforge_studio.cli forge "Collection Export Demo One" --out runs/export_demo_one --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+python -m waveforge_studio.cli forge "Collection Export Demo Two" --out runs/export_demo_two --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
+python -m waveforge_studio.cli gallery runs --out runs/gallery
+python -m waveforge_studio.cli collection runs/gallery/gallery_manifest.json --out runs/gallery/collection --title "Golden Signal Release" --include-tag has-zip
+python -m waveforge_studio.cli collection-export runs/gallery/collection/collection_manifest.json --out runs/gallery/collection_export
+```

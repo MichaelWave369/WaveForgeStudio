@@ -64,3 +64,9 @@ searchable gallery
   -> curated collection manifest
   -> collection index
   -> showcase / playlist / release set
+
+curated collection manifest
+  -> portable collection export
+  -> selected preview ZIPs
+  -> collection export manifest/receipt
+  -> share/archive release pack
