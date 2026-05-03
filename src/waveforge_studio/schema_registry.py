@@ -22,6 +22,8 @@ _SCHEMAS = [
 ("waveforge.local_av_preview_receipt.v1_alpha","v1_alpha","local av preview receipt","av_preview_receipt.json"),
 ("waveforge.preview_pack_manifest.v1_alpha","v1_alpha","preview pack manifest","preview_pack_manifest.json"),
 ("waveforge.preview_pack_receipt.v1_alpha","v1_alpha","preview pack receipt","preview_pack_receipt.json"),
+("waveforge.preview_pack_zip_manifest.v1_alpha","v1_alpha","preview pack zip manifest","preview_pack_zip_manifest.json"),
+("waveforge.preview_pack_zip_receipt.v1_alpha","v1_alpha","preview pack zip receipt","preview_pack_zip_receipt.json"),
 ]
 
 def list_schemas() -> list[dict]:

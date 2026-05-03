@@ -44,3 +44,8 @@ local AV preview page
   -> portable preview pack
   -> pack manifest/receipt
   -> share/archive folder
+
+portable preview pack
+  -> deterministic preview pack ZIP
+  -> ZIP manifest/receipt
+  -> share/archive artifact
