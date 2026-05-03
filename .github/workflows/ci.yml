@@ -1,0 +1,42 @@
+name: CI
+
+on:
+  push:
+    branches: [main]
+  pull_request:
+    branches: [main]
+
+jobs:
+  verify:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: '3.11'
+
+      - name: Upgrade pip
+        run: python -m pip install --upgrade pip
+
+      - name: Install package + test deps
+        run: python -m pip install -e .[test]
+
+      - name: Run tests
+        run: pytest -q
+
+      - name: Doctor
+        run: python -m waveforge_studio.cli doctor
+
+      - name: Smoke
+        run: python -m waveforge_studio.cli smoke --out runs/ci_golden_demo_smoke
+
+      - name: Upload smoke artifacts
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: ci_golden_demo_smoke
+          path: runs/ci_golden_demo_smoke
+          if-no-files-found: warn
