@@ -25,3 +25,5 @@
 - v2.2-alpha Unified Release Build Command
 
 - v2.3-alpha Deterministic Release Build ZIP
+
+- v2.4-alpha Release Build Verification Report

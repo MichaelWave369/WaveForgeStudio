@@ -179,3 +179,12 @@ python -m waveforge_studio.cli zip-release-build runs/release_build
 python -m waveforge_studio.cli release-build-zip-validate runs/release_build/release_build_zip_manifest.json
 python -m waveforge_studio.cli release-build runs --out runs/release_build_zip --title "Golden Signal Release" --include-tag has-zip --zip
 ```
+
+## Release Build Verification
+
+```bash
+python -m waveforge_studio.cli verify-release-build runs/release_build_zip_verify
+python -m waveforge_studio.cli verify-release-build runs/release_build_zip_verify --strict
+python -m waveforge_studio.cli release-build-verification-validate runs/release_build_zip_verify/release_build_verification.json
+python -m waveforge_studio.cli release-build runs --out runs/release_build_zip_verify --title "Golden Signal Release" --include-tag has-zip --zip --verify
+```

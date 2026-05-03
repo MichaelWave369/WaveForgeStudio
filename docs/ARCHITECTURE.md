@@ -93,3 +93,8 @@ unified release build
   -> deterministic release build ZIP
   -> release build ZIP manifest/receipt
   -> top-level share/archive artifact
+
+release build ZIP
+  -> release build verification report
+  -> verification receipt
+  -> local auditor seal
