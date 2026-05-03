@@ -19,6 +19,10 @@ from .local_audio_renderer import render_audio_stub, validate_audio_render_manif
 from .local_visual_renderer import render_visual_stub, validate_visual_render_manifest
 from .local_av_preview import render_av_preview, validate_av_preview_manifest
 from .preview_pack import write_preview_pack, validate_preview_pack_manifest
+from .preview_pack_zip import write_preview_pack_zip, validate_preview_pack_zip_manifest
+from .demo_gallery import write_demo_gallery, validate_gallery_manifest
+from .gallery_collection import write_gallery_collection, validate_gallery_collection_manifest
+from .collection_export import write_collection_export, validate_collection_export_manifest
 from .smoke import write_golden_demo_smoke
 from .timeline_preview import write_timeline_preview
 from .av_timeline import write_av_timeline, validate_av_timeline
@@ -60,6 +64,8 @@ def forge_command(a):
         render_av_preview(packet, a.out); rendered = True
     if getattr(a, "preview_pack", False):
         write_preview_pack(a.out); rendered = True
+    if getattr(a, "preview_pack_zip", False):
+        write_preview_pack(a.out); write_preview_pack_zip(Path(a.out)/"preview_pack"); rendered = True
     if rendered:
         write_release_manifest(a.out, packet)
     return 0
@@ -78,7 +84,7 @@ def schemas_command(a):
     print(json.dumps({"schema": "waveforge.schema_registry.v1_alpha", "schemas": list_schemas()}, indent=2, sort_keys=True)); return 0
 
 def smoke_command(a):
-    rep = write_golden_demo_smoke(a.out, prompt=a.prompt, duration_seconds=a.duration, seed=a.seed, mode=a.mode, render_audio=getattr(a, "render_audio_stub", False), render_visual=getattr(a, "render_visual_stub", False), av_preview=getattr(a, "av_preview", False), preview_pack=getattr(a, "preview_pack", False))
+    rep = write_golden_demo_smoke(a.out, prompt=a.prompt, duration_seconds=a.duration, seed=a.seed, mode=a.mode, render_audio=getattr(a, "render_audio_stub", False), render_visual=getattr(a, "render_visual_stub", False), av_preview=getattr(a, "av_preview", False), preview_pack=getattr(a, "preview_pack", False), preview_pack_zip=getattr(a, "preview_pack_zip", False))
     print(json.dumps({"out": str(a.out), "smoke_passed": rep['smoke_passed'], "alpha_ready": rep['alpha_ready'], "release_hash": rep['release_hash'], "smoke_hash": rep['receipt']['smoke_hash']}, indent=2, sort_keys=True))
     return 0 if rep['smoke_passed'] else 1
 
@@ -137,6 +143,56 @@ def preview_pack_validate_command(a):
     print('VALID preview pack manifest' if not e else 'INVALID preview pack manifest')
     return 0 if not e else 1
 
+
+
+def zip_preview_pack_command(a):
+    m = write_preview_pack_zip(a.path, a.out)
+    e = validate_preview_pack_zip_manifest(m)
+    print(json.dumps({"zip_path": str((Path(a.out) if a.out else Path(a.path)/"preview_pack.zip")), "file_count": m["file_count"], "zip_sha256": m["receipt"]["zip_file_sha256"], "preview_pack_zip_hash": m["receipt"]["preview_pack_zip_hash"]}, indent=2, sort_keys=True))
+    return 0 if not e else 1
+
+
+def preview_pack_zip_validate_command(a):
+    m=json.loads(Path(a.path).read_text(encoding='utf-8')); e=validate_preview_pack_zip_manifest(m)
+    print('VALID preview pack zip manifest' if not e else 'INVALID preview pack zip manifest')
+    return 0 if not e else 1
+
+
+def gallery_command(a):
+    out = a.out or str(Path(a.root_dir)/"gallery")
+    m = write_demo_gallery(a.root_dir, out)
+    e = validate_gallery_manifest(m)
+    print(json.dumps({"gallery_path": out, "run_count": m["run_count"], "ready_count": m["ready_count"], "smoke_passed_count": m["smoke_passed_count"], "zip_count": m["zip_count"], "tag_count": m.get("search",{}).get("tag_count",0), "available_tags_preview": m.get("search",{}).get("available_tags",[])[:10], "gallery_hash": m["receipt"]["gallery_hash"]}, indent=2, sort_keys=True))
+    return 0 if not e else 1
+
+def gallery_validate_command(a):
+    m=json.loads(Path(a.path).read_text(encoding='utf-8')); e=validate_gallery_manifest(m)
+    print('VALID gallery manifest' if not e else 'INVALID gallery manifest')
+    return 0 if not e else 1
+
+
+def collection_command(a):
+    m = write_gallery_collection(a.path, a.out, title=a.title, description=a.description, include_tags=a.include_tag, include_run_paths=a.include_run, exclude_tags=a.exclude_tag)
+    e = validate_gallery_collection_manifest(m)
+    print(json.dumps({"collection_path": str(Path(a.out) if a.out else Path(a.path).parent/"collection"), "title": m["title"], "run_count": m["run_count"], "ready_count": m["ready_count"], "smoke_passed_count": m["smoke_passed_count"], "zip_count": m["zip_count"], "collection_hash": m["receipt"]["collection_hash"], "missing_run_paths_count": len(m["selection"]["missing_run_paths"])}, indent=2, sort_keys=True))
+    return 0 if not e else 1
+
+def collection_validate_command(a):
+    m=json.loads(Path(a.path).read_text(encoding='utf-8')); e=validate_gallery_collection_manifest(m)
+    print('VALID gallery collection manifest' if not e else 'INVALID gallery collection manifest')
+    return 0 if not e else 1
+
+
+def collection_export_command(a):
+    m=write_collection_export(a.path,a.out)
+    e=validate_collection_export_manifest(m)
+    print(json.dumps({"export_path": str(Path(a.out) if a.out else Path(a.path).parent/"collection_export"), "title": m["title"], "run_count": m["run_count"], "zip_count": m["zip_count"], "missing_zip_count": m["missing_zip_count"], "collection_export_hash": m["receipt"]["collection_export_hash"]}, indent=2, sort_keys=True))
+    return 0 if not e else 1
+
+def collection_export_validate_command(a):
+    m=json.loads(Path(a.path).read_text(encoding='utf-8')); e=validate_collection_export_manifest(m)
+    print('VALID collection export manifest' if not e else 'INVALID collection export manifest')
+    return 0 if not e else 1
 
 def doctor_command(a):
     cmd_summary = ["version","schemas","forge","release","smoke","doctor","compile","validate","inspect","adapters","timeline","timeline-validate","handoff","handoff-validate","queue","queue-validate","run-queue","ledger","bundle","preview","export-phiaudio","export-waverider","export-wavetalk"]
@@ -226,9 +282,9 @@ def build_parser():
     parser=argparse.ArgumentParser(prog='waveforge-studio'); sub=parser.add_subparsers(dest='command',required=True)
     v=sub.add_parser('version'); v.set_defaults(func=version_command)
     s=sub.add_parser('schemas'); s.set_defaults(func=schemas_command)
-    f=sub.add_parser('forge'); f.add_argument('prompt'); f.add_argument('--duration',type=int,default=72); f.add_argument('--seed',type=int,default=369369); f.add_argument('--mode',default='mythic-reel'); f.add_argument('--out',required=True); f.add_argument('--render-audio-stub',action='store_true'); f.add_argument('--render-visual-stub',action='store_true'); f.add_argument('--av-preview',action='store_true'); f.add_argument('--preview-pack',action='store_true'); f.set_defaults(func=forge_command)
+    f=sub.add_parser('forge'); f.add_argument('prompt'); f.add_argument('--duration',type=int,default=72); f.add_argument('--seed',type=int,default=369369); f.add_argument('--mode',default='mythic-reel'); f.add_argument('--out',required=True); f.add_argument('--render-audio-stub',action='store_true'); f.add_argument('--render-visual-stub',action='store_true'); f.add_argument('--av-preview',action='store_true'); f.add_argument('--preview-pack',action='store_true'); f.add_argument('--preview-pack-zip',action='store_true'); f.set_defaults(func=forge_command)
     r=sub.add_parser('release'); r.add_argument('path'); r.set_defaults(func=release_command)
-    sm=sub.add_parser('smoke'); sm.add_argument('--out',required=True); sm.add_argument('--prompt',default='The Sovereign Signal awakens across the infinite fractal wave.'); sm.add_argument('--duration',type=int,default=72); sm.add_argument('--seed',type=int,default=369369); sm.add_argument('--mode',default='mythic-reel'); sm.add_argument('--render-audio-stub',action='store_true'); sm.add_argument('--render-visual-stub',action='store_true'); sm.add_argument('--av-preview',action='store_true'); sm.add_argument('--preview-pack',action='store_true'); sm.set_defaults(func=smoke_command)
+    sm=sub.add_parser('smoke'); sm.add_argument('--out',required=True); sm.add_argument('--prompt',default='The Sovereign Signal awakens across the infinite fractal wave.'); sm.add_argument('--duration',type=int,default=72); sm.add_argument('--seed',type=int,default=369369); sm.add_argument('--mode',default='mythic-reel'); sm.add_argument('--render-audio-stub',action='store_true'); sm.add_argument('--render-visual-stub',action='store_true'); sm.add_argument('--av-preview',action='store_true'); sm.add_argument('--preview-pack',action='store_true'); sm.add_argument('--preview-pack-zip',action='store_true'); sm.set_defaults(func=smoke_command)
     d=sub.add_parser('doctor'); d.set_defaults(func=doctor_command)
     ra=sub.add_parser('render-audio-stub'); ra.add_argument('path'); ra.add_argument('--out',required=True); ra.add_argument('--max-duration',type=int,default=12); ra.add_argument('--sample-rate',type=int,default=48000); ra.set_defaults(func=render_audio_stub_command)
     arv=sub.add_parser('audio-render-validate'); arv.add_argument('path'); arv.set_defaults(func=audio_render_validate_command)
@@ -238,6 +294,14 @@ def build_parser():
     pavv=sub.add_parser('av-preview-validate'); pavv.add_argument('path'); pavv.set_defaults(func=av_preview_validate_command)
     pp=sub.add_parser('pack-preview'); pp.add_argument('path'); pp.add_argument('--out'); pp.set_defaults(func=pack_preview_command)
     ppv=sub.add_parser('preview-pack-validate'); ppv.add_argument('path'); ppv.set_defaults(func=preview_pack_validate_command)
+    zpp=sub.add_parser('zip-preview-pack'); zpp.add_argument('path'); zpp.add_argument('--out'); zpp.set_defaults(func=zip_preview_pack_command)
+    zppv=sub.add_parser('preview-pack-zip-validate'); zppv.add_argument('path'); zppv.set_defaults(func=preview_pack_zip_validate_command)
+    gal=sub.add_parser('gallery'); gal.add_argument('root_dir'); gal.add_argument('--out'); gal.set_defaults(func=gallery_command)
+    galv=sub.add_parser('gallery-validate'); galv.add_argument('path'); galv.set_defaults(func=gallery_validate_command)
+    col=sub.add_parser('collection'); col.add_argument('path'); col.add_argument('--out'); col.add_argument('--title', default='WaveForgeStudio Collection'); col.add_argument('--description', default=''); col.add_argument('--include-tag', action='append'); col.add_argument('--exclude-tag', action='append'); col.add_argument('--include-run', action='append'); col.set_defaults(func=collection_command)
+    colv=sub.add_parser('collection-validate'); colv.add_argument('path'); colv.set_defaults(func=collection_validate_command)
+    cexp=sub.add_parser('collection-export'); cexp.add_argument('path'); cexp.add_argument('--out'); cexp.set_defaults(func=collection_export_command)
+    cexpv=sub.add_parser('collection-export-validate'); cexpv.add_argument('path'); cexpv.set_defaults(func=collection_export_validate_command)
     c=sub.add_parser('compile'); c.add_argument('prompt'); c.add_argument('--duration',type=int,default=72); c.add_argument('--seed',type=int,default=369369); c.add_argument('--mode',default='mythic-reel'); c.add_argument('--out',required=True); c.add_argument('--export-phiaudio',action='store_true'); c.add_argument('--export-waverider',action='store_true'); c.add_argument('--export-wavetalk',action='store_true'); c.add_argument('--preview',action='store_true'); c.add_argument('--timeline',action='store_true'); c.add_argument('--handoff',action='store_true'); c.add_argument('--bundle',action='store_true'); c.add_argument('--queue',action='store_true'); c.add_argument('--run-queue',action='store_true'); c.set_defaults(func=compile_command)
     for n,f,o in [('validate',validate_command,False),('inspect',inspect_command,False),('adapters',adapters_command,False),('timeline-validate',timeline_validate_command,False),('handoff-validate',handoff_validate_command,False),('queue-validate',queue_validate_command,False),('ledger',ledger_command,False),('export-phiaudio',export_phiaudio_command,True),('export-waverider',export_waverider_command,True),('export-wavetalk',export_wavetalk_command,True),('preview',preview_command,True),('timeline',timeline_command,True),('handoff',handoff_command,True),('queue',queue_command,True),('run-queue',run_queue_command,True),('bundle',bundle_command,True)]:
         p=sub.add_parser(n); p.add_argument('path');

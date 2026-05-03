@@ -22,6 +22,14 @@ _SCHEMAS = [
 ("waveforge.local_av_preview_receipt.v1_alpha","v1_alpha","local av preview receipt","av_preview_receipt.json"),
 ("waveforge.preview_pack_manifest.v1_alpha","v1_alpha","preview pack manifest","preview_pack_manifest.json"),
 ("waveforge.preview_pack_receipt.v1_alpha","v1_alpha","preview pack receipt","preview_pack_receipt.json"),
+("waveforge.preview_pack_zip_manifest.v1_alpha","v1_alpha","preview pack zip manifest","preview_pack_zip_manifest.json"),
+("waveforge.preview_pack_zip_receipt.v1_alpha","v1_alpha","preview pack zip receipt","preview_pack_zip_receipt.json"),
+("waveforge.demo_gallery_manifest.v1_alpha","v1_alpha","Local searchable demo gallery manifest","gallery_manifest.json"),
+("waveforge.demo_gallery_receipt.v1_alpha","v1_alpha","demo gallery receipt","gallery_receipt.json"),
+("waveforge.gallery_collection_manifest.v1_alpha","v1_alpha","gallery collection manifest","collection_manifest.json"),
+("waveforge.gallery_collection_receipt.v1_alpha","v1_alpha","gallery collection receipt","collection_receipt.json"),
+("waveforge.collection_export_manifest.v1_alpha","v1_alpha","collection export manifest","collection_export_manifest.json"),
+("waveforge.collection_export_receipt.v1_alpha","v1_alpha","collection export receipt","collection_export_receipt.json"),
 ]
 
 def list_schemas() -> list[dict]:
