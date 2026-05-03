@@ -23,3 +23,5 @@
 - v2.1-alpha Deterministic Release Deck ZIP
 
 - v2.2-alpha Unified Release Build Command
+
+- v2.3-alpha Deterministic Release Build ZIP

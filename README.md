@@ -171,3 +171,11 @@ python -m waveforge_studio.cli forge "Release Build Demo One" --out runs/release
 python -m waveforge_studio.cli forge "Release Build Demo Two" --out runs/release_build_demo_two --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
 python -m waveforge_studio.cli release-build runs --out runs/release_build --title "Golden Signal Release" --include-tag has-zip
 ```
+
+## Deterministic Release Build ZIP
+
+```bash
+python -m waveforge_studio.cli zip-release-build runs/release_build
+python -m waveforge_studio.cli release-build-zip-validate runs/release_build/release_build_zip_manifest.json
+python -m waveforge_studio.cli release-build runs --out runs/release_build_zip --title "Golden Signal Release" --include-tag has-zip --zip
+```
