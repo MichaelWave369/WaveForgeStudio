@@ -70,3 +70,8 @@ curated collection manifest
   -> selected preview ZIPs
   -> collection export manifest/receipt
   -> share/archive release pack
+
+collection export pack
+  -> alpha release deck
+  -> offline HTML cards + Markdown deck
+  -> showcase / presentation artifact

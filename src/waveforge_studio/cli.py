@@ -23,6 +23,7 @@ from .preview_pack_zip import write_preview_pack_zip, validate_preview_pack_zip_
 from .demo_gallery import write_demo_gallery, validate_gallery_manifest
 from .gallery_collection import write_gallery_collection, validate_gallery_collection_manifest
 from .collection_export import write_collection_export, validate_collection_export_manifest
+from .release_deck import write_release_deck, validate_release_deck_manifest
 from .smoke import write_golden_demo_smoke
 from .timeline_preview import write_timeline_preview
 from .av_timeline import write_av_timeline, validate_av_timeline
@@ -194,6 +195,18 @@ def collection_export_validate_command(a):
     print('VALID collection export manifest' if not e else 'INVALID collection export manifest')
     return 0 if not e else 1
 
+
+def release_deck_command(a):
+    m=write_release_deck(a.path,a.out,title=a.title,subtitle=a.subtitle)
+    e=validate_release_deck_manifest(m)
+    print(json.dumps({"deck_path": str(Path(a.out) if a.out else Path(a.path).parent/"release_deck"), "title": m["title"], "card_count": m["card_count"], "release_deck_hash": m["receipt"]["release_deck_hash"]}, indent=2, sort_keys=True))
+    return 0 if not e else 1
+
+def release_deck_validate_command(a):
+    m=json.loads(Path(a.path).read_text(encoding='utf-8')); e=validate_release_deck_manifest(m)
+    print('VALID release deck manifest' if not e else 'INVALID release deck manifest')
+    return 0 if not e else 1
+
 def doctor_command(a):
     cmd_summary = ["version","schemas","forge","release","smoke","doctor","compile","validate","inspect","adapters","timeline","timeline-validate","handoff","handoff-validate","queue","queue-validate","run-queue","ledger","bundle","preview","export-phiaudio","export-waverider","export-wavetalk"]
     report = {
@@ -302,6 +315,8 @@ def build_parser():
     colv=sub.add_parser('collection-validate'); colv.add_argument('path'); colv.set_defaults(func=collection_validate_command)
     cexp=sub.add_parser('collection-export'); cexp.add_argument('path'); cexp.add_argument('--out'); cexp.set_defaults(func=collection_export_command)
     cexpv=sub.add_parser('collection-export-validate'); cexpv.add_argument('path'); cexpv.set_defaults(func=collection_export_validate_command)
+    rd=sub.add_parser('release-deck'); rd.add_argument('path'); rd.add_argument('--out'); rd.add_argument('--title'); rd.add_argument('--subtitle', default='PHI369 Sovereign Media Showcase'); rd.set_defaults(func=release_deck_command)
+    rdv=sub.add_parser('release-deck-validate'); rdv.add_argument('path'); rdv.set_defaults(func=release_deck_validate_command)
     c=sub.add_parser('compile'); c.add_argument('prompt'); c.add_argument('--duration',type=int,default=72); c.add_argument('--seed',type=int,default=369369); c.add_argument('--mode',default='mythic-reel'); c.add_argument('--out',required=True); c.add_argument('--export-phiaudio',action='store_true'); c.add_argument('--export-waverider',action='store_true'); c.add_argument('--export-wavetalk',action='store_true'); c.add_argument('--preview',action='store_true'); c.add_argument('--timeline',action='store_true'); c.add_argument('--handoff',action='store_true'); c.add_argument('--bundle',action='store_true'); c.add_argument('--queue',action='store_true'); c.add_argument('--run-queue',action='store_true'); c.set_defaults(func=compile_command)
     for n,f,o in [('validate',validate_command,False),('inspect',inspect_command,False),('adapters',adapters_command,False),('timeline-validate',timeline_validate_command,False),('handoff-validate',handoff_validate_command,False),('queue-validate',queue_validate_command,False),('ledger',ledger_command,False),('export-phiaudio',export_phiaudio_command,True),('export-waverider',export_waverider_command,True),('export-wavetalk',export_wavetalk_command,True),('preview',preview_command,True),('timeline',timeline_command,True),('handoff',handoff_command,True),('queue',queue_command,True),('run-queue',run_queue_command,True),('bundle',bundle_command,True)]:
         p=sub.add_parser(n); p.add_argument('path');
