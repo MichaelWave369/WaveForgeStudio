@@ -108,3 +108,7 @@ release certificate
   -> certificate bundle
   -> compact proof packet
   -> certificate bundle manifest/receipt
+
+certificate bundle
+  -> deterministic certificate bundle ZIP
+  -> compact single-file proof archive

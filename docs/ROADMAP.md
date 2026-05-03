@@ -31,3 +31,5 @@
 - v2.5-alpha Release Certificate
 
 - v2.6-alpha Certificate Bundle
+
+- v2.7-alpha Certificate Bundle ZIP
