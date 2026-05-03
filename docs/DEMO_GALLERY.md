@@ -22,3 +22,10 @@ Limitations:
 - no hosting
 - no browser automation
 - no external APIs/subprocesses/network
+
+
+Search + tags:
+- prompt/hash/tag text search
+- filters for mode, archetype, alpha_ready, smoke_passed, has_zip
+- deterministic derived tags, e.g. `alpha-ready`, `has-zip`, `mode:mythic-reel`, `archetype:sovereign_signal`
+- local-only static index (no server, no APIs, no subprocesses, no network)

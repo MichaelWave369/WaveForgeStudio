@@ -160,7 +160,7 @@ def gallery_command(a):
     out = a.out or str(Path(a.root_dir)/"gallery")
     m = write_demo_gallery(a.root_dir, out)
     e = validate_gallery_manifest(m)
-    print(json.dumps({"gallery_path": out, "run_count": m["run_count"], "ready_count": m["ready_count"], "smoke_passed_count": m["smoke_passed_count"], "zip_count": m["zip_count"], "gallery_hash": m["receipt"]["gallery_hash"]}, indent=2, sort_keys=True))
+    print(json.dumps({"gallery_path": out, "run_count": m["run_count"], "ready_count": m["ready_count"], "smoke_passed_count": m["smoke_passed_count"], "zip_count": m["zip_count"], "tag_count": m.get("search",{}).get("tag_count",0), "available_tags_preview": m.get("search",{}).get("available_tags",[])[:10], "gallery_hash": m["receipt"]["gallery_hash"]}, indent=2, sort_keys=True))
     return 0 if not e else 1
 
 def gallery_validate_command(a):

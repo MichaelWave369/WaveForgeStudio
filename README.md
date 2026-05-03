@@ -108,3 +108,5 @@ python -m waveforge_studio.cli forge "Demo one" --out runs/demo_one --render-aud
 python -m waveforge_studio.cli forge "Demo two" --out runs/demo_two --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
 python -m waveforge_studio.cli gallery runs --out runs/gallery
 ```
+
+- searchable gallery with prompt/hash search and tag filtering

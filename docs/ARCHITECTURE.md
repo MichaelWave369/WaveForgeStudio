@@ -54,3 +54,8 @@ multiple preview packs / ZIPs
   -> local demo gallery
   -> gallery manifest/receipt
   -> archive browser
+
+multiple preview packs / ZIPs
+  -> searchable local demo gallery
+  -> tags / filters / hash search
+  -> gallery manifest/receipt

@@ -11,3 +11,5 @@
 - v1.5-alpha Deterministic Preview Pack ZIP Export
 
 - v1.6-alpha Local Demo Gallery Index
+
+- v1.7-alpha Gallery Search + Tags
