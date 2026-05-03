@@ -28,3 +28,20 @@ python -m waveforge_studio.cli schemas
 python -m waveforge_studio.cli forge "The Sovereign Signal awakens across the infinite fractal wave." --out runs/golden_demo
 python -m waveforge_studio.cli release runs/golden_demo
 ```
+
+
+## CI / Fresh Clone Verification
+
+Local check:
+
+```bash
+python -m pytest -q
+python -m waveforge_studio.cli doctor
+python -m waveforge_studio.cli smoke --out runs/golden_demo_smoke
+```
+
+If Makefile is available:
+
+```bash
+make ci-local
+```
