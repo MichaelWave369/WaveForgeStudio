@@ -159,3 +159,8 @@ renderer handoff / AV timeline
 renderer adapter interface
   -> optional FFmpeg adapter contract
   -> future opt-in local mux/export adapter
+
+
+PHIAudio bridge bundle
+  -> PHIAudio adapter pilot contract
+  -> future opt-in local audio runtime adapter
