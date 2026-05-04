@@ -48,3 +48,7 @@ python -m waveforge_studio.cli ffmpeg-adapter-contract --out runs/final_release
 ```bash
 python -m waveforge_studio.cli phiaudio-adapter-contract --out runs/final_release
 ```
+
+```bash
+python -m waveforge_studio.cli waverider-adapter-contract --out runs/final_release
+```

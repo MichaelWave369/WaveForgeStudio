@@ -295,3 +295,11 @@ python -m waveforge_studio.cli phiaudio-adapter-contract --out runs/phiaudio_con
 python -m waveforge_studio.cli phiaudio-adapter-contract-validate runs/phiaudio_contract/phiaudio_adapter_contract.json
 python -m waveforge_studio.cli finalize-release runs --out runs/final_release_phiaudio_contract --title "Golden Signal Release" --include-tag has-zip --renderer-adapters --phiaudio-adapter-contract
 ```
+
+## WaveRider Adapter Pilot Contract
+
+```bash
+python -m waveforge_studio.cli waverider-adapter-contract --out runs/waverider_contract
+python -m waveforge_studio.cli waverider-adapter-contract-validate runs/waverider_contract/waverider_adapter_contract.json
+python -m waveforge_studio.cli finalize-release runs --out runs/final_release_waverider_contract --title "Golden Signal Release" --include-tag has-zip --renderer-adapters --waverider-adapter-contract
+```

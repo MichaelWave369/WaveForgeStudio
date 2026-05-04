@@ -8,6 +8,7 @@ def test_renderer_adapters(tmp_path):
     assert "local_audio_stub" in ids and "local_visual_stub" in ids and "local_av_preview" in ids
     assert any(a['adapter_id']=='ffmpeg_optional_future' and a.get('contract_artifact')=='ffmpeg_adapter_contract.json' for a in m['future_adapters'])
     assert any(a['adapter_id']=='phiaudio_runtime_future' and a.get('contract_artifact')=='phiaudio_adapter_contract.json' for a in m['future_adapters'])
+    assert any(a['adapter_id']=='waverider_runtime_future' and a.get('contract_artifact')=='waverider_adapter_contract.json' for a in m['future_adapters'])
     assert m['adapter_policy']['execution_enabled'] is False
     assert len(ids+ [a['adapter_id'] for a in m['future_adapters']])==len(set(ids+ [a['adapter_id'] for a in m['future_adapters']]))
     assert all(a['execution_enabled'] is False and a['safe_by_default'] is False for a in m['future_adapters'])

@@ -164,3 +164,8 @@ renderer adapter interface
 PHIAudio bridge bundle
   -> PHIAudio adapter pilot contract
   -> future opt-in local audio runtime adapter
+
+
+WaveRider bridge bundle
+  -> WaveRider adapter pilot contract
+  -> future opt-in local visual/video runtime adapter
