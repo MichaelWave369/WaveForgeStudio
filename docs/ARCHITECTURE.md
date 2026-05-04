@@ -137,3 +137,14 @@ Prompt
 - All current rendering is placeholder/stub/local.
 - Release pipeline is packaging/provenance/verification, not model generation.
 - No external runtime execution in v3.0-alpha.
+
+
+final release
+  -> signature envelope
+  -> canonical signing payload
+  -> future detached signature
+
+
+signature envelope
+  -> detached signature manifest dry-run
+  -> future detached Ed25519 signature
