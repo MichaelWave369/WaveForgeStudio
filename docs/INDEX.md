@@ -38,3 +38,5 @@
 
 ## CLI Command Inventory
 - `python -m waveforge_studio.cli command-inventory --out docs/generated`
+
+- [SIGNATURE_ENVELOPE.md](SIGNATURE_ENVELOPE.md)
