@@ -39,9 +39,9 @@
 - v2.9-alpha Release Build Finalizer
 
 - v3.0-alpha Golden Release Candidate Hardening
-- v3.1-alpha Signature Envelope (future)
-- v3.2-alpha Detached Manifest Signing (future)
-- v3.3-alpha Local Renderer Adapter Interface (future)
+- v3.1-alpha Signature Envelope
+- v3.2-alpha Detached Manifest Signing Dry Run
+- v3.3-alpha Local Renderer Adapter Interface
 - v3.4-alpha Optional FFmpeg Export Adapter (future)
 - v3.5-alpha PHIAudio Adapter Pilot (future)
 - v3.6-alpha WaveRider Adapter Pilot (future)
