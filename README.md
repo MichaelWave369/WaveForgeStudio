@@ -254,3 +254,52 @@ python -m waveforge_studio.cli finalize-release runs --out runs/final_release --
 - no hosting
 - no legal certificate
 - not cryptographically signed yet
+
+
+## Signature Envelope
+
+```bash
+python -m waveforge_studio.cli signature-envelope runs/final_release
+python -m waveforge_studio.cli signature-envelope-validate runs/final_release/signature_envelope.json
+python -m waveforge_studio.cli finalize-release runs --out runs/final_release_signed_ready --title "Golden Signal Release" --include-tag has-zip --signature-envelope
+```
+
+## Detached Signature Manifest
+
+```bash
+python -m waveforge_studio.cli detached-signature runs/final_release
+python -m waveforge_studio.cli detached-signature-validate runs/final_release/detached_signature_manifest.json
+python -m waveforge_studio.cli finalize-release runs --out runs/final_release_signing_dry_run --title "Golden Signal Release" --include-tag has-zip --signature-envelope --detached-signature
+```
+
+## Renderer Adapter Interface
+
+```bash
+python -m waveforge_studio.cli renderer-adapters --out runs/renderer_adapters
+python -m waveforge_studio.cli renderer-adapters-validate runs/renderer_adapters/renderer_adapter_manifest.json
+python -m waveforge_studio.cli finalize-release runs --out runs/final_release_adapters --title "Golden Signal Release" --include-tag has-zip --renderer-adapters
+```
+
+## Optional FFmpeg Adapter Contract
+
+```bash
+python -m waveforge_studio.cli ffmpeg-adapter-contract --out runs/ffmpeg_contract
+python -m waveforge_studio.cli ffmpeg-adapter-contract-validate runs/ffmpeg_contract/ffmpeg_adapter_contract.json
+python -m waveforge_studio.cli finalize-release runs --out runs/final_release_ffmpeg_contract --title "Golden Signal Release" --include-tag has-zip --renderer-adapters --ffmpeg-adapter-contract
+```
+
+## PHIAudio Adapter Pilot Contract
+
+```bash
+python -m waveforge_studio.cli phiaudio-adapter-contract --out runs/phiaudio_contract
+python -m waveforge_studio.cli phiaudio-adapter-contract-validate runs/phiaudio_contract/phiaudio_adapter_contract.json
+python -m waveforge_studio.cli finalize-release runs --out runs/final_release_phiaudio_contract --title "Golden Signal Release" --include-tag has-zip --renderer-adapters --phiaudio-adapter-contract
+```
+
+## WaveRider Adapter Pilot Contract
+
+```bash
+python -m waveforge_studio.cli waverider-adapter-contract --out runs/waverider_contract
+python -m waveforge_studio.cli waverider-adapter-contract-validate runs/waverider_contract/waverider_adapter_contract.json
+python -m waveforge_studio.cli finalize-release runs --out runs/final_release_waverider_contract --title "Golden Signal Release" --include-tag has-zip --renderer-adapters --waverider-adapter-contract
+```
