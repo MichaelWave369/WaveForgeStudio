@@ -26,3 +26,33 @@ python -m waveforge_studio.cli final-release-validate runs/final_release/final_r
 python -m waveforge_studio.cli verify-release-build runs/final_release --strict
 python -m waveforge_studio.cli release-certificate-validate runs/final_release/release_certificate.json
 ```
+
+
+Optional signing-ready step:
+```bash
+python -m waveforge_studio.cli signature-envelope runs/final_release
+```
+
+```bash
+python -m waveforge_studio.cli detached-signature runs/final_release
+```
+
+```bash
+python -m waveforge_studio.cli renderer-adapters --out runs/final_release
+```
+
+```bash
+python -m waveforge_studio.cli ffmpeg-adapter-contract --out runs/final_release
+```
+
+```bash
+python -m waveforge_studio.cli phiaudio-adapter-contract --out runs/final_release
+```
+
+```bash
+python -m waveforge_studio.cli waverider-adapter-contract --out runs/final_release
+```
+
+```bash
+python -m waveforge_studio.cli adapter-contract-bundle --out runs/final_release/adapter_contract_bundle
+```
