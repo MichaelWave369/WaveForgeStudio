@@ -169,3 +169,8 @@ PHIAudio bridge bundle
 WaveRider bridge bundle
   -> WaveRider adapter pilot contract
   -> future opt-in local visual/video runtime adapter
+
+
+renderer adapter interface + adapter contracts
+  -> adapter contract bundle
+  -> future renderer law pack

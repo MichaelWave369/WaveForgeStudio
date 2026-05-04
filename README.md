@@ -303,3 +303,11 @@ python -m waveforge_studio.cli waverider-adapter-contract --out runs/waverider_c
 python -m waveforge_studio.cli waverider-adapter-contract-validate runs/waverider_contract/waverider_adapter_contract.json
 python -m waveforge_studio.cli finalize-release runs --out runs/final_release_waverider_contract --title "Golden Signal Release" --include-tag has-zip --renderer-adapters --waverider-adapter-contract
 ```
+
+## Adapter Contract Bundle
+
+```bash
+python -m waveforge_studio.cli adapter-contract-bundle --out runs/adapter_contract_bundle
+python -m waveforge_studio.cli adapter-contract-bundle-validate runs/adapter_contract_bundle/adapter_contract_bundle_manifest.json
+python -m waveforge_studio.cli finalize-release runs --out runs/final_release_adapter_bundle --title "Golden Signal Release" --include-tag has-zip --adapter-contract-bundle
+```

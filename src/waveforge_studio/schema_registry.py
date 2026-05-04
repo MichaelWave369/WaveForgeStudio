@@ -64,6 +64,8 @@ _SCHEMAS = [
 ("waveforge.phiaudio_adapter_contract_receipt.v3_alpha","v3_alpha","phiaudio adapter contract receipt","phiaudio_adapter_contract_receipt.json"),
 ("waveforge.waverider_adapter_contract.v3_alpha","v3_alpha","waverider adapter contract","waverider_adapter_contract.json"),
 ("waveforge.waverider_adapter_contract_receipt.v3_alpha","v3_alpha","waverider adapter contract receipt","waverider_adapter_contract_receipt.json"),
+("waveforge.adapter_contract_bundle_manifest.v3_alpha","v3_alpha","adapter contract bundle manifest","adapter_contract_bundle_manifest.json"),
+("waveforge.adapter_contract_bundle_receipt.v3_alpha","v3_alpha","adapter contract bundle receipt","adapter_contract_bundle_receipt.json"),
 ]
 
 def list_schemas() -> list[dict]:

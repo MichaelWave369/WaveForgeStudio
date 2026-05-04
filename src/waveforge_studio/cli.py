@@ -46,6 +46,7 @@ from .renderer_adapters import write_renderer_adapter_manifest, validate_rendere
 from .ffmpeg_adapter_contract import write_ffmpeg_adapter_contract, validate_ffmpeg_adapter_contract
 from .phiaudio_adapter_contract import write_phiaudio_adapter_contract, validate_phiaudio_adapter_contract
 from .waverider_adapter_contract import write_waverider_adapter_contract, validate_waverider_adapter_contract
+from .adapter_contract_bundle import write_adapter_contract_bundle, validate_adapter_contract_bundle_manifest
 
 def _load_valid(path:str):
     p=json.loads(Path(path).read_text(encoding='utf-8')); return p, validate_media_packet(p)
@@ -349,6 +350,9 @@ def finalize_release_command(a):
     if getattr(a, "waverider_adapter_contract", False):
         wac=write_waverider_adapter_contract(final_path)
         out.update({"waverider_adapter_contract_hash": wac["receipt"]["waverider_adapter_contract_hash"], "waverider_adapter_status": wac["status"]})
+    if getattr(a, "adapter_contract_bundle", False):
+        acb=write_adapter_contract_bundle(final_path/"adapter_contract_bundle", source_dir=final_path)
+        out.update({"adapter_contract_bundle_hash": acb["receipt"]["adapter_contract_bundle_hash"], "adapter_contract_bundle_path": str(final_path/"adapter_contract_bundle")})
     print(json.dumps(out, indent=2, sort_keys=True))
     return 0 if (not e and m["stages"]["verification"]["passed"]) else 1
 
@@ -421,6 +425,22 @@ def waverider_adapter_contract_command(a):
     print(json.dumps({"output_path": str(out), "status": c["status"], "execution_enabled": c["execution_policy"]["execution_enabled"], "requires_external_runtime": c["execution_policy"]["requires_external_runtime"], "waverider_adapter_contract_hash": c["receipt"]["waverider_adapter_contract_hash"]}, indent=2, sort_keys=True))
     return 0 if not e else 1
 
+
+
+
+def adapter_contract_bundle_command(a):
+    out=a.out or 'adapter_contract_bundle'
+    m=write_adapter_contract_bundle(out, source_dir=a.source)
+    e=validate_adapter_contract_bundle_manifest(m)
+    print(json.dumps({"bundle_path": str(out), "contract_count": m["contract_count"], "future_runtime_count": m["future_runtime_count"], "evidence_count": m["evidence_count"], "required_missing_count": len(m["required_missing"]), "adapter_contract_bundle_hash": m["receipt"]["adapter_contract_bundle_hash"]}, indent=2, sort_keys=True))
+    return 0 if not e else 1
+
+
+def adapter_contract_bundle_validate_command(a):
+    m=json.loads(Path(a.path).read_text(encoding='utf-8'))
+    e=validate_adapter_contract_bundle_manifest(m)
+    print('VALID adapter contract bundle manifest' if not e else 'INVALID adapter contract bundle manifest')
+    return 0 if not e else 1
 
 def waverider_adapter_contract_validate_command(a):
     c=json.loads(Path(a.path).read_text(encoding='utf-8'))
@@ -595,7 +615,7 @@ def build_parser():
     zcbv=sub.add_parser('certificate-bundle-zip-validate'); zcbv.add_argument('path'); zcbv.set_defaults(func=certificate_bundle_zip_validate_command)
     rbi=sub.add_parser('release-build-index'); rbi.add_argument('path'); rbi.set_defaults(func=release_build_index_command)
     rbiv=sub.add_parser('release-build-index-validate'); rbiv.add_argument('path'); rbiv.set_defaults(func=release_build_index_validate_command)
-    fr=sub.add_parser('finalize-release'); fr.add_argument('runs_root'); fr.add_argument('--out'); fr.add_argument('--title', default='WaveForgeStudio Final Release'); fr.add_argument('--description', default=''); fr.add_argument('--include-tag', action='append'); fr.add_argument('--exclude-tag', action='append'); fr.add_argument('--include-run', action='append'); fr.add_argument('--signature-envelope', action='store_true'); fr.add_argument('--detached-signature', action='store_true'); fr.add_argument('--detached-signature-algorithm-hint', default='future-ed25519-detached'); fr.add_argument('--renderer-adapters', action='store_true'); fr.add_argument('--ffmpeg-adapter-contract', action='store_true'); fr.add_argument('--phiaudio-adapter-contract', action='store_true'); fr.add_argument('--waverider-adapter-contract', action='store_true'); fr.set_defaults(func=finalize_release_command)
+    fr=sub.add_parser('finalize-release'); fr.add_argument('runs_root'); fr.add_argument('--out'); fr.add_argument('--title', default='WaveForgeStudio Final Release'); fr.add_argument('--description', default=''); fr.add_argument('--include-tag', action='append'); fr.add_argument('--exclude-tag', action='append'); fr.add_argument('--include-run', action='append'); fr.add_argument('--signature-envelope', action='store_true'); fr.add_argument('--detached-signature', action='store_true'); fr.add_argument('--detached-signature-algorithm-hint', default='future-ed25519-detached'); fr.add_argument('--renderer-adapters', action='store_true'); fr.add_argument('--ffmpeg-adapter-contract', action='store_true'); fr.add_argument('--phiaudio-adapter-contract', action='store_true'); fr.add_argument('--waverider-adapter-contract', action='store_true'); fr.add_argument('--adapter-contract-bundle', action='store_true'); fr.set_defaults(func=finalize_release_command)
     frv=sub.add_parser('final-release-validate'); frv.add_argument('path'); frv.set_defaults(func=final_release_validate_command)
     ci=sub.add_parser('command-inventory'); ci.add_argument('--out'); ci.set_defaults(func=command_inventory_command)
     civ=sub.add_parser('command-inventory-validate'); civ.add_argument('path'); civ.set_defaults(func=command_inventory_validate_command)
@@ -611,6 +631,8 @@ def build_parser():
     pacv=sub.add_parser('phiaudio-adapter-contract-validate'); pacv.add_argument('path'); pacv.set_defaults(func=phiaudio_adapter_contract_validate_command)
     wac=sub.add_parser('waverider-adapter-contract'); wac.add_argument('--out'); wac.set_defaults(func=waverider_adapter_contract_command)
     wacv=sub.add_parser('waverider-adapter-contract-validate'); wacv.add_argument('path'); wacv.set_defaults(func=waverider_adapter_contract_validate_command)
+    acb=sub.add_parser('adapter-contract-bundle'); acb.add_argument('--out'); acb.add_argument('--source'); acb.set_defaults(func=adapter_contract_bundle_command)
+    acbv=sub.add_parser('adapter-contract-bundle-validate'); acbv.add_argument('path'); acbv.set_defaults(func=adapter_contract_bundle_validate_command)
     c=sub.add_parser('compile'); c.add_argument('prompt'); c.add_argument('--duration',type=int,default=72); c.add_argument('--seed',type=int,default=369369); c.add_argument('--mode',default='mythic-reel'); c.add_argument('--out',required=True); c.add_argument('--export-phiaudio',action='store_true'); c.add_argument('--export-waverider',action='store_true'); c.add_argument('--export-wavetalk',action='store_true'); c.add_argument('--preview',action='store_true'); c.add_argument('--timeline',action='store_true'); c.add_argument('--handoff',action='store_true'); c.add_argument('--bundle',action='store_true'); c.add_argument('--queue',action='store_true'); c.add_argument('--run-queue',action='store_true'); c.set_defaults(func=compile_command)
     for n,f,o in [('validate',validate_command,False),('inspect',inspect_command,False),('adapters',adapters_command,False),('timeline-validate',timeline_validate_command,False),('handoff-validate',handoff_validate_command,False),('queue-validate',queue_validate_command,False),('ledger',ledger_command,False),('export-phiaudio',export_phiaudio_command,True),('export-waverider',export_waverider_command,True),('export-wavetalk',export_wavetalk_command,True),('preview',preview_command,True),('timeline',timeline_command,True),('handoff',handoff_command,True),('queue',queue_command,True),('run-queue',run_queue_command,True),('bundle',bundle_command,True)]:
         p=sub.add_parser(n); p.add_argument('path');
