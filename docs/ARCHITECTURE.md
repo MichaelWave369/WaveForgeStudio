@@ -154,3 +154,8 @@ renderer handoff / AV timeline
   -> renderer adapter interface
   -> local stub adapters now
   -> future optional runtime adapters later
+
+
+renderer adapter interface
+  -> optional FFmpeg adapter contract
+  -> future opt-in local mux/export adapter
