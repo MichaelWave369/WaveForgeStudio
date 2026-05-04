@@ -1,0 +1,40 @@
+# WaveForgeStudio Docs Index
+
+## Quickstart
+- [GOLDEN_WORKFLOW.md](GOLDEN_WORKFLOW.md)
+- [FINAL_RELEASE.md](FINAL_RELEASE.md)
+
+## Blessed Golden Workflow
+- Forge two runs -> finalize-release -> open `final_release/index.html`.
+
+## Core Concepts
+- [ARCHITECTURE.md](ARCHITECTURE.md)
+- [ROADMAP.md](ROADMAP.md)
+
+## Render Stubs
+- [LOCAL_AUDIO_RENDER_STUB.md](LOCAL_AUDIO_RENDER_STUB.md)
+- [LOCAL_VISUAL_RENDER_STUB.md](LOCAL_VISUAL_RENDER_STUB.md)
+- [LOCAL_AV_PREVIEW.md](LOCAL_AV_PREVIEW.md)
+
+## Preview / Packaging
+- [PREVIEW_PACK.md](PREVIEW_PACK.md)
+- [PREVIEW_PACK_ZIP.md](PREVIEW_PACK_ZIP.md)
+
+## Gallery / Collections
+- [DEMO_GALLERY.md](DEMO_GALLERY.md)
+- [GALLERY_COLLECTIONS.md](GALLERY_COLLECTIONS.md)
+- [COLLECTION_EXPORT.md](COLLECTION_EXPORT.md)
+
+## Release Build
+- [RELEASE_BUILD.md](RELEASE_BUILD.md)
+- [RELEASE_BUILD_ZIP.md](RELEASE_BUILD_ZIP.md)
+- [RELEASE_BUILD_INDEX.md](RELEASE_BUILD_INDEX.md)
+
+## Verification / Certificate / Proof Bundle
+- [RELEASE_BUILD_VERIFICATION.md](RELEASE_BUILD_VERIFICATION.md)
+- [RELEASE_CERTIFICATE.md](RELEASE_CERTIFICATE.md)
+- [CERTIFICATE_BUNDLE.md](CERTIFICATE_BUNDLE.md)
+- [CERTIFICATE_BUNDLE_ZIP.md](CERTIFICATE_BUNDLE_ZIP.md)
+
+## CLI Command Inventory
+- `python -m waveforge_studio.cli command-inventory --out docs/generated`
