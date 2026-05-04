@@ -271,3 +271,11 @@ python -m waveforge_studio.cli detached-signature runs/final_release
 python -m waveforge_studio.cli detached-signature-validate runs/final_release/detached_signature_manifest.json
 python -m waveforge_studio.cli finalize-release runs --out runs/final_release_signing_dry_run --title "Golden Signal Release" --include-tag has-zip --signature-envelope --detached-signature
 ```
+
+## Renderer Adapter Interface
+
+```bash
+python -m waveforge_studio.cli renderer-adapters --out runs/renderer_adapters
+python -m waveforge_studio.cli renderer-adapters-validate runs/renderer_adapters/renderer_adapter_manifest.json
+python -m waveforge_studio.cli finalize-release runs --out runs/final_release_adapters --title "Golden Signal Release" --include-tag has-zip --renderer-adapters
+```

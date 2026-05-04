@@ -148,3 +148,9 @@ final release
 signature envelope
   -> detached signature manifest dry-run
   -> future detached Ed25519 signature
+
+
+renderer handoff / AV timeline
+  -> renderer adapter interface
+  -> local stub adapters now
+  -> future optional runtime adapters later

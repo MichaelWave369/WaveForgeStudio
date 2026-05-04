@@ -56,6 +56,8 @@ _SCHEMAS = [
 ("waveforge.signature_envelope_receipt.v3_alpha","v3_alpha","signature envelope receipt","signature_envelope_receipt.json"),
 ("waveforge.detached_signature_manifest.v3_alpha","v3_alpha","detached signature manifest","detached_signature_manifest.json"),
 ("waveforge.detached_signature_receipt.v3_alpha","v3_alpha","detached signature receipt","detached_signature_receipt.json"),
+("waveforge.renderer_adapter_manifest.v3_alpha","v3_alpha","renderer adapter manifest","renderer_adapter_manifest.json"),
+("waveforge.renderer_adapter_receipt.v3_alpha","v3_alpha","renderer adapter receipt","renderer_adapter_receipt.json"),
 ]
 
 def list_schemas() -> list[dict]:

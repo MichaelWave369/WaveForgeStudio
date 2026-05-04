@@ -36,3 +36,7 @@ python -m waveforge_studio.cli signature-envelope runs/final_release
 ```bash
 python -m waveforge_studio.cli detached-signature runs/final_release
 ```
+
+```bash
+python -m waveforge_studio.cli renderer-adapters --out runs/final_release
+```
