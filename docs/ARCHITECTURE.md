@@ -124,3 +124,16 @@ runs root
   -> certificate_bundle.zip
   -> index.html
   -> final release manifest/receipt
+
+Prompt
+  -> Forge Run
+  -> Preview Pack ZIP
+  -> Finalize Release
+  -> Release Build ZIP
+  -> Certificate Bundle ZIP
+  -> Release Index
+  -> Final Manifest / Receipt
+
+- All current rendering is placeholder/stub/local.
+- Release pipeline is packaging/provenance/verification, not model generation.
+- No external runtime execution in v3.0-alpha.

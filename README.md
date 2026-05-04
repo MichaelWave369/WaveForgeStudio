@@ -232,3 +232,25 @@ python -m waveforge_studio.cli forge "Final Release Demo One" --out runs/final_r
 python -m waveforge_studio.cli forge "Final Release Demo Two" --out runs/final_release_demo_two --render-audio-stub --render-visual-stub --av-preview --preview-pack --preview-pack-zip
 python -m waveforge_studio.cli finalize-release runs --out runs/final_release --title "Golden Signal Release" --include-tag has-zip
 ```
+
+# WaveForgeStudio v3.0-alpha
+
+## Golden operator path
+1. Forge runs
+2. Finalize release
+3. Open `final_release/index.html`
+4. Share `release_build.zip` and `certificate_bundle.zip`
+
+## What this is
+- deterministic local-first AV release pipeline
+- stub rendering for audio/visual placeholders
+- packaging, gallery, release, verification, certificate, finalizer
+
+## What this is not
+- not real generative audio/video yet
+- no external APIs
+- no FFmpeg
+- no browser automation
+- no hosting
+- no legal certificate
+- not cryptographically signed yet

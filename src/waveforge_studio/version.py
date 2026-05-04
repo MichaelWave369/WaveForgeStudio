@@ -1,4 +1,4 @@
-__version__ = "1.0.0-alpha"
+__version__ = "3.0-alpha"
 RELEASE_NAME = "Golden Signal"
 PROJECT_NAME = "WaveForgeStudio"
 PROJECT_SUBTITLE = "PHI369 Sovereign Media Studio"

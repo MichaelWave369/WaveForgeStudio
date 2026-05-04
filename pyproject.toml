@@ -4,7 +4,7 @@ build-backend = "setuptools.build_meta"
 
 [project]
 name = "waveforge-studio"
-version = "0.1.0"
+version = "3.0-alpha"
 description = "WaveForgeStudio — PHI369 Sovereign Media Studio"
 readme = "README.md"
 requires-python = ">=3.11"

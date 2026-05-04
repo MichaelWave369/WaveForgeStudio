@@ -50,6 +50,8 @@ _SCHEMAS = [
 ("waveforge.release_build_index_receipt.v2_alpha","v2_alpha","release build index receipt","release_build_index_receipt.json"),
 ("waveforge.final_release_manifest.v2_alpha","v2_alpha","final release manifest","final_release_manifest.json"),
 ("waveforge.final_release_receipt.v2_alpha","v2_alpha","final release receipt","final_release_receipt.json"),
+("waveforge.command_inventory.v3_alpha","v3_alpha","command inventory","command_inventory.json"),
+("waveforge.command_inventory_receipt.v3_alpha","v3_alpha","command inventory receipt","command_inventory_receipt.json"),
 ]
 
 def list_schemas() -> list[dict]:
