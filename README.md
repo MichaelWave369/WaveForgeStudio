@@ -254,3 +254,12 @@ python -m waveforge_studio.cli finalize-release runs --out runs/final_release --
 - no hosting
 - no legal certificate
 - not cryptographically signed yet
+
+
+## Signature Envelope
+
+```bash
+python -m waveforge_studio.cli signature-envelope runs/final_release
+python -m waveforge_studio.cli signature-envelope-validate runs/final_release/signature_envelope.json
+python -m waveforge_studio.cli finalize-release runs --out runs/final_release_signed_ready --title "Golden Signal Release" --include-tag has-zip --signature-envelope
+```

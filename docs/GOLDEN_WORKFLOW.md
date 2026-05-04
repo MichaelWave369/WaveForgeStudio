@@ -26,3 +26,9 @@ python -m waveforge_studio.cli final-release-validate runs/final_release/final_r
 python -m waveforge_studio.cli verify-release-build runs/final_release --strict
 python -m waveforge_studio.cli release-certificate-validate runs/final_release/release_certificate.json
 ```
+
+
+Optional signing-ready step:
+```bash
+python -m waveforge_studio.cli signature-envelope runs/final_release
+```
