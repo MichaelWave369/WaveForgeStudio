@@ -40,3 +40,5 @@
 - `python -m waveforge_studio.cli command-inventory --out docs/generated`
 
 - [SIGNATURE_ENVELOPE.md](SIGNATURE_ENVELOPE.md)
+
+- [DETACHED_SIGNATURE.md](DETACHED_SIGNATURE.md)

@@ -32,3 +32,7 @@ Optional signing-ready step:
 ```bash
 python -m waveforge_studio.cli signature-envelope runs/final_release
 ```
+
+```bash
+python -m waveforge_studio.cli detached-signature runs/final_release
+```

@@ -143,3 +143,8 @@ final release
   -> signature envelope
   -> canonical signing payload
   -> future detached signature
+
+
+signature envelope
+  -> detached signature manifest dry-run
+  -> future detached Ed25519 signature

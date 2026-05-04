@@ -263,3 +263,11 @@ python -m waveforge_studio.cli signature-envelope runs/final_release
 python -m waveforge_studio.cli signature-envelope-validate runs/final_release/signature_envelope.json
 python -m waveforge_studio.cli finalize-release runs --out runs/final_release_signed_ready --title "Golden Signal Release" --include-tag has-zip --signature-envelope
 ```
+
+## Detached Signature Manifest
+
+```bash
+python -m waveforge_studio.cli detached-signature runs/final_release
+python -m waveforge_studio.cli detached-signature-validate runs/final_release/detached_signature_manifest.json
+python -m waveforge_studio.cli finalize-release runs --out runs/final_release_signing_dry_run --title "Golden Signal Release" --include-tag has-zip --signature-envelope --detached-signature
+```
