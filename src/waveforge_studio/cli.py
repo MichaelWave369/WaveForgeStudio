@@ -40,6 +40,10 @@ from .av_timeline import write_av_timeline, validate_av_timeline
 from .renderer_handoff import write_renderer_handoff, validate_renderer_handoff
 from .validation import validate_media_packet
 from .version import PROJECT_NAME, RELEASE_NAME, __version__
+from .signature_envelope import write_signature_envelope, validate_signature_envelope
+from .detached_signature import write_detached_signature_manifest, validate_detached_signature_manifest
+from .renderer_adapters import write_renderer_adapter_manifest, validate_renderer_adapter_manifest
+from .ffmpeg_adapter_contract import write_ffmpeg_adapter_contract, validate_ffmpeg_adapter_contract
 
 def _load_valid(path:str):
     p=json.loads(Path(path).read_text(encoding='utf-8')); return p, validate_media_packet(p)
@@ -322,8 +326,22 @@ def release_build_index_validate_command(a):
 
 def finalize_release_command(a):
     m=write_final_release(a.runs_root,a.out,title=a.title,description=a.description,include_tags=a.include_tag,exclude_tags=a.exclude_tag,include_run_paths=a.include_run)
+    final_path = Path(a.out) if a.out else Path(a.runs_root)/"final_release"
+    sig = write_signature_envelope(final_path) if getattr(a, "signature_envelope", False) else None
+    dsm = write_detached_signature_manifest(final_path, algorithm_hint=getattr(a, "detached_signature_algorithm_hint", "future-ed25519-detached")) if getattr(a, "detached_signature", False) else None
     e=validate_final_release_manifest(m)
-    print(json.dumps({"final_path": str(Path(a.out) if a.out else Path(a.runs_root)/"final_release"), "title": m["title"], "discovered_runs": m["counts"]["discovered_runs"], "selected_runs": m["counts"]["selected_runs"], "verification_passed": m["stages"]["verification"]["passed"], "certificate_status": m["stages"]["certificate"]["certificate_status"], "release_build_zip": m["outputs"]["release_build_zip"], "certificate_bundle_zip": m["outputs"]["certificate_bundle_zip"], "final_release_hash": m["receipt"]["final_release_hash"]}, indent=2, sort_keys=True))
+    out={"final_path": str(final_path), "title": m["title"], "discovered_runs": m["counts"]["discovered_runs"], "selected_runs": m["counts"]["selected_runs"], "verification_passed": m["stages"]["verification"]["passed"], "certificate_status": m["stages"]["certificate"]["certificate_status"], "release_build_zip": m["outputs"]["release_build_zip"], "certificate_bundle_zip": m["outputs"]["certificate_bundle_zip"], "final_release_hash": m["receipt"]["final_release_hash"]}
+    if sig:
+        out.update({"signature_envelope_status": sig["envelope_status"], "signature_envelope_hash": sig["receipt"]["signature_envelope_hash"]})
+    if dsm:
+        out.update({"detached_signature_status": dsm["signature_status"], "detached_signature_manifest_hash": dsm["receipt"]["detached_signature_manifest_hash"]})
+    if getattr(a, "renderer_adapters", False):
+        ram=write_renderer_adapter_manifest(final_path)
+        out.update({"renderer_adapter_manifest_hash": ram["receipt"]["renderer_adapter_manifest_hash"], "renderer_adapter_count": ram["adapter_count"]})
+    if getattr(a, "ffmpeg_adapter_contract", False):
+        fac=write_ffmpeg_adapter_contract(final_path)
+        out.update({"ffmpeg_adapter_contract_hash": fac["receipt"]["ffmpeg_adapter_contract_hash"], "ffmpeg_adapter_status": fac["status"]})
+    print(json.dumps(out, indent=2, sort_keys=True))
     return 0 if (not e and m["stages"]["verification"]["passed"]) else 1
 
 def final_release_validate_command(a):
@@ -336,6 +354,69 @@ def command_inventory_command(a):
     inv=write_command_inventory(out); e=validate_command_inventory(inv)
     print(json.dumps({"command_count": inv["command_count"], "category_count": len(inv["categories"]), "missing_expected_command_count": len(inv.get("missing_expected_commands",[])), "command_inventory_hash": inv["receipt"]["command_inventory_hash"], "output_path": str(out)}, indent=2, sort_keys=True))
     return 0 if not e else 1
+
+
+
+def signature_envelope_command(a):
+    e = write_signature_envelope(a.path)
+    errors = validate_signature_envelope(e)
+    f = e["signing_payload"]["fields"]
+    print(json.dumps({"final_path": str(a.path), "envelope_status": e["envelope_status"], "payload_hash": e["signing_payload"]["payload_hash"], "signature_envelope_hash": e["receipt"]["signature_envelope_hash"], "release_build_zip_sha256": f["release_build_zip_sha256"], "certificate_bundle_zip_sha256": f["certificate_bundle_zip_sha256"]}, indent=2, sort_keys=True))
+    return 0 if not errors else 1
+
+
+
+
+def detached_signature_command(a):
+    m = write_detached_signature_manifest(a.path, algorithm_hint=a.algorithm_hint)
+    e = validate_detached_signature_manifest(m)
+    print(json.dumps({"final_path": str(a.path), "signature_status": m["signature_status"], "algorithm_hint": m["signing_request"]["algorithm_hint"], "payload_hash": m["signing_request"]["payload_hash"], "source_signature_envelope_hash": m["source"]["signature_envelope"]["signature_envelope_hash"], "detached_signature_manifest_hash": m["receipt"]["detached_signature_manifest_hash"]}, indent=2, sort_keys=True))
+    return 0 if not e else 1
+
+
+
+
+def renderer_adapters_command(a):
+    out=a.out or '.'
+    m=write_renderer_adapter_manifest(out)
+    e=validate_renderer_adapter_manifest(m)
+    print(json.dumps({"output_path": str(out), "adapter_count": m["adapter_count"], "future_adapter_count": len(m["future_adapters"]), "execution_enabled_adapter_count": m["execution_enabled_adapter_count"], "renderer_adapter_manifest_hash": m["receipt"]["renderer_adapter_manifest_hash"]}, indent=2, sort_keys=True))
+    return 0 if not e else 1
+
+
+
+
+def ffmpeg_adapter_contract_command(a):
+    out=a.out or '.'
+    c=write_ffmpeg_adapter_contract(out)
+    e=validate_ffmpeg_adapter_contract(c)
+    print(json.dumps({"output_path": str(out), "status": c["status"], "execution_enabled": c["execution_policy"]["execution_enabled"], "requires_ffmpeg": c["execution_policy"]["requires_ffmpeg"], "ffmpeg_adapter_contract_hash": c["receipt"]["ffmpeg_adapter_contract_hash"]}, indent=2, sort_keys=True))
+    return 0 if not e else 1
+
+
+def ffmpeg_adapter_contract_validate_command(a):
+    c=json.loads(Path(a.path).read_text(encoding='utf-8'))
+    e=validate_ffmpeg_adapter_contract(c)
+    print('VALID ffmpeg adapter contract' if not e else 'INVALID ffmpeg adapter contract')
+    return 0 if not e else 1
+
+def renderer_adapters_validate_command(a):
+    m=json.loads(Path(a.path).read_text(encoding='utf-8'))
+    e=validate_renderer_adapter_manifest(m)
+    print('VALID renderer adapter manifest' if not e else 'INVALID renderer adapter manifest')
+    return 0 if not e else 1
+
+def detached_signature_validate_command(a):
+    m = json.loads(Path(a.path).read_text(encoding="utf-8"))
+    e = validate_detached_signature_manifest(m)
+    print('VALID detached signature manifest' if not e else 'INVALID detached signature manifest')
+    return 0 if not e else 1
+
+def signature_envelope_validate_command(a):
+    e = json.loads(Path(a.path).read_text(encoding="utf-8"))
+    errors = validate_signature_envelope(e)
+    print('VALID signature envelope' if not errors else 'INVALID signature envelope')
+    return 0 if not errors else 1
 
 def command_inventory_validate_command(a):
     inv=json.loads(Path(a.path).read_text(encoding='utf-8')); e=validate_command_inventory(inv)
@@ -474,10 +555,18 @@ def build_parser():
     zcbv=sub.add_parser('certificate-bundle-zip-validate'); zcbv.add_argument('path'); zcbv.set_defaults(func=certificate_bundle_zip_validate_command)
     rbi=sub.add_parser('release-build-index'); rbi.add_argument('path'); rbi.set_defaults(func=release_build_index_command)
     rbiv=sub.add_parser('release-build-index-validate'); rbiv.add_argument('path'); rbiv.set_defaults(func=release_build_index_validate_command)
-    fr=sub.add_parser('finalize-release'); fr.add_argument('runs_root'); fr.add_argument('--out'); fr.add_argument('--title', default='WaveForgeStudio Final Release'); fr.add_argument('--description', default=''); fr.add_argument('--include-tag', action='append'); fr.add_argument('--exclude-tag', action='append'); fr.add_argument('--include-run', action='append'); fr.set_defaults(func=finalize_release_command)
+    fr=sub.add_parser('finalize-release'); fr.add_argument('runs_root'); fr.add_argument('--out'); fr.add_argument('--title', default='WaveForgeStudio Final Release'); fr.add_argument('--description', default=''); fr.add_argument('--include-tag', action='append'); fr.add_argument('--exclude-tag', action='append'); fr.add_argument('--include-run', action='append'); fr.add_argument('--signature-envelope', action='store_true'); fr.add_argument('--detached-signature', action='store_true'); fr.add_argument('--detached-signature-algorithm-hint', default='future-ed25519-detached'); fr.add_argument('--renderer-adapters', action='store_true'); fr.add_argument('--ffmpeg-adapter-contract', action='store_true'); fr.set_defaults(func=finalize_release_command)
     frv=sub.add_parser('final-release-validate'); frv.add_argument('path'); frv.set_defaults(func=final_release_validate_command)
     ci=sub.add_parser('command-inventory'); ci.add_argument('--out'); ci.set_defaults(func=command_inventory_command)
     civ=sub.add_parser('command-inventory-validate'); civ.add_argument('path'); civ.set_defaults(func=command_inventory_validate_command)
+    se=sub.add_parser('signature-envelope'); se.add_argument('path'); se.set_defaults(func=signature_envelope_command)
+    sev=sub.add_parser('signature-envelope-validate'); sev.add_argument('path'); sev.set_defaults(func=signature_envelope_validate_command)
+    ds=sub.add_parser('detached-signature'); ds.add_argument('path'); ds.add_argument('--algorithm-hint', default='future-ed25519-detached'); ds.set_defaults(func=detached_signature_command)
+    dsv=sub.add_parser('detached-signature-validate'); dsv.add_argument('path'); dsv.set_defaults(func=detached_signature_validate_command)
+    ra=sub.add_parser('renderer-adapters'); ra.add_argument('--out'); ra.set_defaults(func=renderer_adapters_command)
+    rav=sub.add_parser('renderer-adapters-validate'); rav.add_argument('path'); rav.set_defaults(func=renderer_adapters_validate_command)
+    fac=sub.add_parser('ffmpeg-adapter-contract'); fac.add_argument('--out'); fac.set_defaults(func=ffmpeg_adapter_contract_command)
+    facv=sub.add_parser('ffmpeg-adapter-contract-validate'); facv.add_argument('path'); facv.set_defaults(func=ffmpeg_adapter_contract_validate_command)
     c=sub.add_parser('compile'); c.add_argument('prompt'); c.add_argument('--duration',type=int,default=72); c.add_argument('--seed',type=int,default=369369); c.add_argument('--mode',default='mythic-reel'); c.add_argument('--out',required=True); c.add_argument('--export-phiaudio',action='store_true'); c.add_argument('--export-waverider',action='store_true'); c.add_argument('--export-wavetalk',action='store_true'); c.add_argument('--preview',action='store_true'); c.add_argument('--timeline',action='store_true'); c.add_argument('--handoff',action='store_true'); c.add_argument('--bundle',action='store_true'); c.add_argument('--queue',action='store_true'); c.add_argument('--run-queue',action='store_true'); c.set_defaults(func=compile_command)
     for n,f,o in [('validate',validate_command,False),('inspect',inspect_command,False),('adapters',adapters_command,False),('timeline-validate',timeline_validate_command,False),('handoff-validate',handoff_validate_command,False),('queue-validate',queue_validate_command,False),('ledger',ledger_command,False),('export-phiaudio',export_phiaudio_command,True),('export-waverider',export_waverider_command,True),('export-wavetalk',export_wavetalk_command,True),('preview',preview_command,True),('timeline',timeline_command,True),('handoff',handoff_command,True),('queue',queue_command,True),('run-queue',run_queue_command,True),('bundle',bundle_command,True)]:
         p=sub.add_parser(n); p.add_argument('path');
