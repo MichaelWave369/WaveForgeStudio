@@ -22,17 +22,17 @@ def test_pass5_real_artifact_survives_paracut_bridge_and_waveforge_receipt():
     plan = bridge["payloadRefOrInline"]["native"]
     image_uri = plan["inputs"][0]["uri"]
     prefix, encoded = image_uri.split(",", 1)
-    assert prefix == "data:image/png;base64"
+    assert prefix == "data:image/svg+xml;base64"
 
-    png_bytes = base64.b64decode(encoded)
-    png_sha256 = hashlib.sha256(png_bytes).hexdigest()
-    assert len(png_bytes) == 1150
-    assert png_sha256 == "06f4e6612f5cda7c8596813426c35fd44a40f8d11db016c3e7a655ac6d7c342c"
+    artifact_bytes = base64.b64decode(encoded)
+    artifact_sha256 = hashlib.sha256(artifact_bytes).hexdigest()
+    assert len(artifact_bytes) == 356
+    assert artifact_sha256 == "e973d160eb0774197d2d59db89277c9c6a28ff0e2b736a24fe3bebb559fb9efe"
 
     plan_sha256 = sha256_digest(plan)
-    assert plan_sha256 == "c929aa69ebf11d0c6878caedefb7dffc621f52fb5716b55acc45e01be16ac088"
+    assert plan_sha256 == "dbfaa18ae5cfff24a8252f69f18ffe69e72afba3f0a729c6eb3bb32668c53710"
     assert bridge["contentHash"] == f"sha256:{plan_sha256}"
-    assert sha256_digest(bridge) == "58c15e00d96a4a823a316b1c4e732deaa3ff9f7f816d9d2fe2be260ac2e46f1a"
+    assert sha256_digest(bridge) == "9826123c19dc9b43ba680440a426fdcd6b4d684e64cde8b7e8eea01924ea6266"
 
     intake = create_paracut_bridge_intake(bridge)
     assert_valid_paracut_bridge_intake(intake)
