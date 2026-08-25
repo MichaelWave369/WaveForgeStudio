@@ -92,6 +92,13 @@ def test_paracut_bridge_rejects_native_plan_mutated_after_hash():
         create_paracut_bridge_intake(bridge)
 
 
+def test_paracut_bridge_rejects_transfer_id_substitution():
+    bridge = _bridge()
+    bridge["transferId"] = "paracut-waveforge:plan_substituted"
+    with pytest.raises(ValueError, match="transferId does not match native ParaCut plan_id"):
+        create_paracut_bridge_intake(bridge)
+
+
 def test_intake_validation_detects_render_plan_mutation_after_receipt():
     intake = create_paracut_bridge_intake(_bridge())
     tampered = copy.deepcopy(intake)
@@ -106,6 +113,15 @@ def test_intake_validation_detects_lineage_substitution_after_receipt():
     tampered = copy.deepcopy(intake)
     tampered["lineage"]["source_plan_id"] = "plan_substituted"
     errors = validate_paracut_bridge_intake(tampered)
+    assert "receipt.intake_hash does not match intake contents" in errors
+
+
+def test_intake_validation_detects_transfer_id_substitution_after_receipt():
+    intake = create_paracut_bridge_intake(_bridge())
+    tampered = copy.deepcopy(intake)
+    tampered["transfer_id"] = "paracut-waveforge:plan_substituted"
+    errors = validate_paracut_bridge_intake(tampered)
+    assert "transfer_id does not match render_plan.plan_id" in errors
     assert "receipt.intake_hash does not match intake contents" in errors
 
 
