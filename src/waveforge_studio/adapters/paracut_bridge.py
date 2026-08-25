@@ -8,6 +8,15 @@ from ..hashing import sha256_digest
 _SHA256 = re.compile(r"^sha256:[0-9a-fA-F]{64}$")
 
 
+def _plan_revision(bridge: dict[str, Any]) -> int | None:
+    revision = bridge.get("planRevision")
+    if revision is None:
+        return None
+    if isinstance(revision, bool) or not isinstance(revision, int) or revision < 1:
+        raise ValueError("planRevision must be a positive integer when supplied")
+    return revision
+
+
 def create_paracut_bridge_intake(bridge: dict[str, Any]) -> dict[str, Any]:
     if bridge.get("schema") != "parallax.bridge.v1":
         raise ValueError("Expected parallax.bridge.v1")
@@ -33,6 +42,7 @@ def create_paracut_bridge_intake(bridge: dict[str, Any]) -> dict[str, Any]:
     if bridge.get("transferId") != expected_transfer_id:
         raise ValueError("transferId does not match native ParaCut plan_id")
 
+    plan_revision = _plan_revision(bridge)
     source_content_hash = bridge.get("contentHash")
     if source_content_hash is not None and not _SHA256.match(str(source_content_hash)):
         raise ValueError("contentHash must be null or sha256:<64 hex>")
@@ -68,6 +78,8 @@ def create_paracut_bridge_intake(bridge: dict[str, Any]) -> dict[str, Any]:
             "auto_import_into_media_packet": False,
         },
     }
+    if plan_revision is not None:
+        intake["plan_revision"] = plan_revision
     intake["receipt"] = {
         "schema": "waveforge.paracut_bridge_intake_receipt.v1_alpha",
         "intake_hash": sha256_digest(intake),
@@ -78,6 +90,61 @@ def create_paracut_bridge_intake(bridge: dict[str, Any]) -> dict[str, Any]:
     return intake
 
 
+def accept_paracut_bridge_revision(
+    bridge: dict[str, Any],
+    accepted_revisions: dict[str, dict[str, Any]],
+) -> dict[str, Any]:
+    """Validate a bridge and apply consumer-owned monotonic freshness state.
+
+    The caller owns ``accepted_revisions``. Exact replay of the same revision and
+    bridge hash is idempotent. Lower revisions and same-revision/different-hash
+    equivocation fail closed.
+    """
+
+    intake = create_paracut_bridge_intake(bridge)
+    revision = _plan_revision(bridge)
+    if revision is None:
+        raise ValueError("freshness-aware intake requires planRevision")
+
+    plan = intake["render_plan"]
+    project_id = str(plan["project_id"])
+    bridge_hash = str(intake["bridge_hash"])
+    current = accepted_revisions.get(project_id)
+
+    if current is not None:
+        current_revision = int(current["plan_revision"])
+        current_hash = str(current["bridge_hash"])
+        if revision < current_revision:
+            raise ValueError(
+                f"stale plan revision {revision}; highest accepted revision is {current_revision}"
+            )
+        if revision == current_revision:
+            if bridge_hash != current_hash:
+                raise ValueError("same planRevision carries different bridge content")
+            return {
+                "status": "replay",
+                "project_id": project_id,
+                "plan_revision": revision,
+                "bridge_hash": bridge_hash,
+                "intake": intake,
+            }
+
+    record = {
+        "plan_revision": revision,
+        "plan_id": str(plan["plan_id"]),
+        "bridge_hash": bridge_hash,
+    }
+    accepted_revisions[project_id] = record
+    return {
+        "status": "accepted",
+        "project_id": project_id,
+        "plan_revision": revision,
+        "bridge_hash": bridge_hash,
+        "record": record,
+        "intake": intake,
+    }
+
+
 def validate_paracut_bridge_intake(intake: dict[str, Any]) -> list[str]:
     errors: list[str] = []
     if intake.get("schema") != "waveforge.paracut_bridge_intake.v1_alpha":
@@ -86,6 +153,11 @@ def validate_paracut_bridge_intake(intake: dict[str, Any]) -> list[str]:
         errors.append("source_system must be ParaCut")
     if not intake.get("bridge_hash"):
         errors.append("bridge_hash required")
+    plan_revision = intake.get("plan_revision")
+    if plan_revision is not None and (
+        isinstance(plan_revision, bool) or not isinstance(plan_revision, int) or plan_revision < 1
+    ):
+        errors.append("plan_revision must be a positive integer")
     render_plan = intake.get("render_plan")
     if not isinstance(render_plan, dict):
         errors.append("render_plan required")
