@@ -32,6 +32,10 @@ def create_paracut_bridge_intake(bridge: dict[str, Any]) -> dict[str, Any]:
     source_content_hash = bridge.get("contentHash")
     if source_content_hash is not None and not _SHA256.match(str(source_content_hash)):
         raise ValueError("contentHash must be null or sha256:<64 hex>")
+    if source_content_hash is not None:
+        expected_native_hash = f"sha256:{sha256_digest(native)}"
+        if str(source_content_hash).lower() != expected_native_hash:
+            raise ValueError("contentHash does not match canonical native ParaCut RenderPlan")
 
     intake = {
         "schema": "waveforge.paracut_bridge_intake.v1_alpha",
@@ -78,8 +82,16 @@ def validate_paracut_bridge_intake(intake: dict[str, Any]) -> list[str]:
         errors.append("source_system must be ParaCut")
     if not intake.get("bridge_hash"):
         errors.append("bridge_hash required")
-    if not isinstance(intake.get("render_plan"), dict):
+    render_plan = intake.get("render_plan")
+    if not isinstance(render_plan, dict):
         errors.append("render_plan required")
+    else:
+        source_content_hash = intake.get("source_content_hash")
+        if source_content_hash is not None:
+            expected_native_hash = f"sha256:{sha256_digest(render_plan)}"
+            if str(source_content_hash).lower() != expected_native_hash:
+                errors.append("source_content_hash does not match canonical render_plan")
+
     safety = intake.get("safety") or {}
     for key in (
         "reference_only",
@@ -97,8 +109,19 @@ def validate_paracut_bridge_intake(intake: dict[str, Any]) -> list[str]:
     ):
         if safety.get(key) is not False:
             errors.append(f"safety.{key} must be false")
-    if not (intake.get("receipt") or {}).get("intake_hash"):
+
+    receipt = intake.get("receipt") or {}
+    if not receipt.get("intake_hash"):
         errors.append("receipt.intake_hash required")
+    else:
+        receipt_bound_intake = {key: value for key, value in intake.items() if key != "receipt"}
+        if receipt.get("intake_hash") != sha256_digest(receipt_bound_intake):
+            errors.append("receipt.intake_hash does not match intake contents")
+    if receipt.get("bridge_hash") != intake.get("bridge_hash"):
+        errors.append("receipt.bridge_hash does not match intake.bridge_hash")
+    if receipt.get("source_content_hash") != intake.get("source_content_hash"):
+        errors.append("receipt.source_content_hash does not match intake.source_content_hash")
+
     return errors
 
 
