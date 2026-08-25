@@ -29,6 +29,10 @@ def create_paracut_bridge_intake(bridge: dict[str, Any]) -> dict[str, Any]:
         if not native.get(field):
             raise ValueError(f"Native ParaCut RenderPlan requires {field}")
 
+    expected_transfer_id = f"paracut-waveforge:{native['plan_id']}"
+    if bridge.get("transferId") != expected_transfer_id:
+        raise ValueError("transferId does not match native ParaCut plan_id")
+
     source_content_hash = bridge.get("contentHash")
     if source_content_hash is not None and not _SHA256.match(str(source_content_hash)):
         raise ValueError("contentHash must be null or sha256:<64 hex>")
@@ -86,6 +90,9 @@ def validate_paracut_bridge_intake(intake: dict[str, Any]) -> list[str]:
     if not isinstance(render_plan, dict):
         errors.append("render_plan required")
     else:
+        expected_transfer_id = f"paracut-waveforge:{render_plan.get('plan_id')}"
+        if intake.get("transfer_id") != expected_transfer_id:
+            errors.append("transfer_id does not match render_plan.plan_id")
         source_content_hash = intake.get("source_content_hash")
         if source_content_hash is not None:
             expected_native_hash = f"sha256:{sha256_digest(render_plan)}"
