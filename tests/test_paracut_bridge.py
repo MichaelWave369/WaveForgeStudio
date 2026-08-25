@@ -125,12 +125,22 @@ def test_intake_validation_detects_transfer_id_substitution_after_receipt():
     assert "receipt.intake_hash does not match intake contents" in errors
 
 
-def test_intake_validation_detects_execution_flag_escalation_after_receipt():
+@pytest.mark.parametrize(
+    "flag",
+    [
+        "external_calls_allowed",
+        "subprocess_allowed",
+        "network_allowed",
+        "real_rendering_allowed",
+        "auto_import_into_media_packet",
+    ],
+)
+def test_intake_validation_detects_execution_flag_escalation_after_receipt(flag: str):
     intake = create_paracut_bridge_intake(_bridge())
     tampered = copy.deepcopy(intake)
-    tampered["safety"]["real_rendering_allowed"] = True
+    tampered["safety"][flag] = True
     errors = validate_paracut_bridge_intake(tampered)
-    assert "safety.real_rendering_allowed must be false" in errors
+    assert f"safety.{flag} must be false" in errors
     assert "receipt.intake_hash does not match intake contents" in errors
 
 
@@ -140,3 +150,25 @@ def test_intake_validation_detects_receipt_hash_substitution():
     tampered["receipt"]["bridge_hash"] = "0" * 64
     errors = validate_paracut_bridge_intake(tampered)
     assert "receipt.bridge_hash does not match intake.bridge_hash" in errors
+
+
+def test_exact_bridge_replay_is_deterministic_and_cannot_escalate_authority():
+    bridge = _bridge()
+    first = create_paracut_bridge_intake(copy.deepcopy(bridge))
+    second = create_paracut_bridge_intake(copy.deepcopy(bridge))
+
+    # Current intake is stateless and reference-only: exact replay is idempotent,
+    # producing the same hashes/receipt instead of multiplying authority.
+    assert first == second
+    assert first["receipt"]["intake_hash"] == second["receipt"]["intake_hash"]
+    assert first["bridge_hash"] == second["bridge_hash"]
+
+    safety = second["safety"]
+    assert safety["requires_user_action"] is True
+    assert safety["reference_only"] is True
+    assert safety["handoff_only"] is True
+    assert safety["external_calls_allowed"] is False
+    assert safety["subprocess_allowed"] is False
+    assert safety["network_allowed"] is False
+    assert safety["real_rendering_allowed"] is False
+    assert safety["auto_import_into_media_packet"] is False
