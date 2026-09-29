@@ -1,5 +1,25 @@
 # WaveForgeStudio — PHI369 Sovereign Media Studio (v0.9)
 
+## Parallax Creative Interop v2
+
+WaveForgeStudio now has a candidate lineage-aware ParaCut intake for:
+
+```text
+Domistika
+→ Auralith369
+→ ParaCut RenderPlan
+→ WaveForgeStudio
+```
+
+The v2 intake independently verifies the ParaCut RenderPlan hash, creative-lineage hashes, `lineageRef`, monotonic `planRevision`, and explicit false authority flags. The existing v1 intake remains supported.
+
+WaveForge can also build an optional **reference-only CineSwarm packet**. The CineSwarm receiver is currently unratified, so that packet performs no network call, no automatic import, no acquisition, no publishing, and grants no render authority.
+
+See:
+
+- [Parallax Creative Interop v2](docs/PARALLAX_CREATIVE_INTEROP_V2.md)
+- [CineSwarm Release Reference Extension](docs/CINESWARM_RELEASE_REFERENCE_V2.md)
+
 ## Renderer Handoff Pack
 Deterministic future renderer input pack derived from media packet + AV timeline.
 
