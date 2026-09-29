@@ -17,7 +17,7 @@ def _plan_revision(bridge: dict[str, Any]) -> int | None:
     return revision
 
 
-def create_paracut_bridge_intake(bridge: dict[str, Any]) -> dict[str, Any]:
+def _create_paracut_bridge_intake_v1(bridge: dict[str, Any]) -> dict[str, Any]:
     if bridge.get("schema") != "parallax.bridge.v1":
         raise ValueError("Expected parallax.bridge.v1")
     if bridge.get("protocol") != "parallax-bridge" or bridge.get("version") != 1:
@@ -89,6 +89,163 @@ def create_paracut_bridge_intake(bridge: dict[str, Any]) -> dict[str, Any]:
     }
     return intake
 
+
+
+def _assert_sha256(value: Any, label: str) -> str:
+    text = str(value or "")
+    if not _SHA256.match(text):
+        raise ValueError(f"{label} must be sha256:<64 hex>")
+    return text.lower()
+
+
+def _validate_creative_lineage_v2(lineage: Any) -> dict[str, Any]:
+    if not isinstance(lineage, dict):
+        raise ValueError("Creative Interop v2 requires creativeLineage")
+    if lineage.get("profile") != "parallax.creative-interop.v2":
+        raise ValueError("creativeLineage.profile must be parallax.creative-interop.v2")
+    if lineage.get("sourceBridgeSchema") != "parallax.bridge.v2":
+        raise ValueError("creativeLineage.sourceBridgeSchema must be parallax.bridge.v2")
+    if not lineage.get("sourceTransferId"):
+        raise ValueError("creativeLineage.sourceTransferId required")
+
+    normalized = dict(lineage)
+    normalized["creativeManifestHash"] = _assert_sha256(
+        lineage.get("creativeManifestHash"), "creativeLineage.creativeManifestHash"
+    )
+    normalized["baseContentHash"] = _assert_sha256(
+        lineage.get("baseContentHash"), "creativeLineage.baseContentHash"
+    )
+
+    overlay_hashes = lineage.get("overlayContentHashes")
+    count = lineage.get("semanticOverlayCount")
+    if isinstance(count, bool) or not isinstance(count, int) or count < 0 or count > 16:
+        raise ValueError("creativeLineage.semanticOverlayCount must be an integer from 0 to 16")
+    if not isinstance(overlay_hashes, list) or len(overlay_hashes) != count:
+        raise ValueError("creativeLineage overlay hash count must match semanticOverlayCount")
+    normalized["overlayContentHashes"] = [
+        _assert_sha256(value, "creativeLineage.overlayContentHashes") for value in overlay_hashes
+    ]
+
+    for field in ("auralithCaptureHash", "auralithReceiptHash"):
+        if field in lineage:
+            normalized[field] = _assert_sha256(lineage.get(field), f"creativeLineage.{field}")
+
+    asset_hashes = lineage.get("paraCutAssetHashes")
+    if asset_hashes is not None:
+        if not isinstance(asset_hashes, list):
+            raise ValueError("creativeLineage.paraCutAssetHashes must be a list")
+        normalized["paraCutAssetHashes"] = [
+            _assert_sha256(value, "creativeLineage.paraCutAssetHashes") for value in asset_hashes
+        ]
+
+    return normalized
+
+
+def _create_paracut_bridge_intake_v2(bridge: dict[str, Any]) -> dict[str, Any]:
+    if bridge.get("schema") != "parallax.bridge.v2":
+        raise ValueError("Expected parallax.bridge.v2")
+    if bridge.get("protocol") != "parallax-bridge" or bridge.get("version") != 2:
+        raise ValueError("Unsupported Parallax bridge protocol/version")
+    if bridge.get("interopProfile") != "parallax.creative-interop.v2":
+        raise ValueError("Expected parallax.creative-interop.v2 profile")
+    if bridge.get("source") != "ParaCut" or bridge.get("target") != "WaveForgeStudio":
+        raise ValueError("Unsupported bridge route")
+    if bridge.get("localOnly") is not True:
+        raise ValueError("ParaCut bridge must remain local-only")
+    if bridge.get("requiresUserAction") is not True:
+        raise ValueError("ParaCut bridge must require explicit user action")
+    if bridge.get("payloadType") != "application/vnd.paracut.render-plan+json":
+        raise ValueError("Unsupported ParaCut payload type")
+
+    authority = bridge.get("authority")
+    if not isinstance(authority, dict):
+        raise ValueError("Creative Interop v2 requires explicit authority block")
+    for key in (
+        "realRenderingAuthorized",
+        "networkAuthorized",
+        "subprocessAuthorized",
+        "automaticImportAuthorized",
+        "publishAuthorized",
+    ):
+        if authority.get(key) is not False:
+            raise ValueError(f"authority.{key} must be false")
+
+    native = (bridge.get("payloadRefOrInline") or {}).get("native")
+    if not isinstance(native, dict):
+        raise ValueError("Native ParaCut RenderPlan payload is required")
+    for field in ("plan_id", "job_id", "project_id", "output_uri", "created_at"):
+        if not native.get(field):
+            raise ValueError(f"Native ParaCut RenderPlan requires {field}")
+
+    expected_transfer_id = f"paracut-waveforge-v2:{native['plan_id']}"
+    if bridge.get("transferId") != expected_transfer_id:
+        raise ValueError("transferId does not match native ParaCut plan_id")
+
+    revision = _plan_revision(bridge)
+    if revision is None:
+        raise ValueError("Creative Interop v2 requires planRevision")
+
+    source_content_hash = _assert_sha256(bridge.get("contentHash"), "contentHash")
+    expected_native_hash = f"sha256:{sha256_digest(native)}"
+    if source_content_hash != expected_native_hash:
+        raise ValueError("contentHash does not match canonical native ParaCut RenderPlan")
+
+    lineage = _validate_creative_lineage_v2(bridge.get("creativeLineage"))
+    lineage_ref = bridge.get("lineageRef")
+    if lineage_ref != lineage["creativeManifestHash"]:
+        raise ValueError("lineageRef must equal creativeLineage.creativeManifestHash")
+
+    creative_lineage_hash = f"sha256:{sha256_digest(lineage)}"
+    intake = {
+        "schema": "waveforge.paracut_bridge_intake.v2_alpha",
+        "project": "WaveForgeStudio",
+        "source_system": "ParaCut",
+        "source_bridge_schema": "parallax.bridge.v2",
+        "interop_profile": "parallax.creative-interop.v2",
+        "transfer_id": bridge.get("transferId"),
+        "received_at": bridge.get("createdAt"),
+        "source_content_hash": source_content_hash,
+        "bridge_hash": sha256_digest(bridge),
+        "render_plan": native,
+        "plan_revision": revision,
+        "creative_lineage": lineage,
+        "creative_lineage_hash": creative_lineage_hash,
+        "lineage": {
+            "source_project_id": native["project_id"],
+            "source_job_id": native["job_id"],
+            "source_plan_id": native["plan_id"],
+            "creative_manifest_hash": lineage["creativeManifestHash"],
+        },
+        "warnings": list(bridge.get("warnings") or []),
+        "safety": {
+            "reference_only": True,
+            "handoff_only": True,
+            "requires_user_action": True,
+            "external_calls_allowed": False,
+            "subprocess_allowed": False,
+            "network_allowed": False,
+            "real_rendering_allowed": False,
+            "auto_import_into_media_packet": False,
+            "publish_allowed": False,
+        },
+    }
+    receipt_bound = dict(intake)
+    intake["receipt"] = {
+        "schema": "waveforge.paracut_bridge_intake_receipt.v2_alpha",
+        "intake_hash": sha256_digest(receipt_bound),
+        "bridge_hash": intake["bridge_hash"],
+        "source_content_hash": source_content_hash,
+        "creative_lineage_hash": creative_lineage_hash,
+        "creative_manifest_hash": lineage["creativeManifestHash"],
+        "created_at": bridge.get("createdAt"),
+    }
+    return intake
+
+
+def create_paracut_bridge_intake(bridge: dict[str, Any]) -> dict[str, Any]:
+    if bridge.get("schema") == "parallax.bridge.v2" or bridge.get("version") == 2:
+        return _create_paracut_bridge_intake_v2(bridge)
+    return _create_paracut_bridge_intake_v1(bridge)
 
 def accept_paracut_bridge_revision(
     bridge: dict[str, Any],
