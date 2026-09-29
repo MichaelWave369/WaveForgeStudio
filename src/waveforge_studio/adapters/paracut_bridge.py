@@ -304,22 +304,39 @@ def accept_paracut_bridge_revision(
 
 def validate_paracut_bridge_intake(intake: dict[str, Any]) -> list[str]:
     errors: list[str] = []
-    if intake.get("schema") != "waveforge.paracut_bridge_intake.v1_alpha":
+    schema = intake.get("schema")
+    if schema not in (
+        "waveforge.paracut_bridge_intake.v1_alpha",
+        "waveforge.paracut_bridge_intake.v2_alpha",
+    ):
         errors.append("schema invalid")
+    is_v2 = schema == "waveforge.paracut_bridge_intake.v2_alpha"
+
     if intake.get("source_system") != "ParaCut":
         errors.append("source_system must be ParaCut")
     if not intake.get("bridge_hash"):
         errors.append("bridge_hash required")
+
+    if is_v2:
+        if intake.get("source_bridge_schema") != "parallax.bridge.v2":
+            errors.append("source_bridge_schema must be parallax.bridge.v2")
+        if intake.get("interop_profile") != "parallax.creative-interop.v2":
+            errors.append("interop_profile must be parallax.creative-interop.v2")
+
     plan_revision = intake.get("plan_revision")
     if plan_revision is not None and (
         isinstance(plan_revision, bool) or not isinstance(plan_revision, int) or plan_revision < 1
     ):
         errors.append("plan_revision must be a positive integer")
+    if is_v2 and plan_revision is None:
+        errors.append("plan_revision required for v2")
+
     render_plan = intake.get("render_plan")
     if not isinstance(render_plan, dict):
         errors.append("render_plan required")
     else:
-        expected_transfer_id = f"paracut-waveforge:{render_plan.get('plan_id')}"
+        prefix = "paracut-waveforge-v2:" if is_v2 else "paracut-waveforge:"
+        expected_transfer_id = f"{prefix}{render_plan.get('plan_id')}"
         if intake.get("transfer_id") != expected_transfer_id:
             errors.append("transfer_id does not match render_plan.plan_id")
         source_content_hash = intake.get("source_content_hash")
@@ -336,16 +353,33 @@ def validate_paracut_bridge_intake(intake: dict[str, Any]) -> list[str]:
     ):
         if safety.get(key) is not True:
             errors.append(f"safety.{key} must be true")
-    for key in (
+    false_safety = [
         "external_calls_allowed",
         "subprocess_allowed",
         "network_allowed",
         "real_rendering_allowed",
         "auto_import_into_media_packet",
-    ):
+    ]
+    if is_v2:
+        false_safety.append("publish_allowed")
+    for key in false_safety:
         if safety.get(key) is not False:
             errors.append(f"safety.{key} must be false")
 
+    if is_v2:
+        lineage = intake.get("creative_lineage")
+        try:
+            normalized_lineage = _validate_creative_lineage_v2(lineage)
+        except ValueError as exc:
+            errors.append(str(exc))
+            normalized_lineage = None
+        if normalized_lineage is not None:
+            expected_lineage_hash = f"sha256:{sha256_digest(normalized_lineage)}"
+            if intake.get("creative_lineage_hash") != expected_lineage_hash:
+                errors.append("creative_lineage_hash does not match creative_lineage")
+            lineage_block = intake.get("lineage") or {}
+            if lineage_block.get("creative_manifest_hash") != normalized_lineage.get("creativeManifestHash"):
+                errors.append("lineage.creative_manifest_hash does not match creative_lineage")
     receipt = intake.get("receipt") or {}
     if not receipt.get("intake_hash"):
         errors.append("receipt.intake_hash required")
@@ -357,9 +391,14 @@ def validate_paracut_bridge_intake(intake: dict[str, Any]) -> list[str]:
         errors.append("receipt.bridge_hash does not match intake.bridge_hash")
     if receipt.get("source_content_hash") != intake.get("source_content_hash"):
         errors.append("receipt.source_content_hash does not match intake.source_content_hash")
+    if is_v2:
+        if receipt.get("creative_lineage_hash") != intake.get("creative_lineage_hash"):
+            errors.append("receipt.creative_lineage_hash does not match intake.creative_lineage_hash")
+        lineage = intake.get("creative_lineage") or {}
+        if receipt.get("creative_manifest_hash") != lineage.get("creativeManifestHash"):
+            errors.append("receipt.creative_manifest_hash does not match creative_lineage")
 
     return errors
-
 
 def assert_valid_paracut_bridge_intake(intake: dict[str, Any]) -> None:
     errors = validate_paracut_bridge_intake(intake)
