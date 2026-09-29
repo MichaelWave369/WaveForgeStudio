@@ -1,0 +1,84 @@
+<!doctype html>
+<html lang="en">
+<head>
+  <meta charset="utf-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1" />
+  <title>WaveForgeStudio · Interop Room</title>
+  <style>
+    :root { color-scheme:dark; font-family:ui-monospace,SFMono-Regular,Menlo,Consolas,monospace; background:#07090d; color:#edf2fb; }
+    * { box-sizing:border-box; }
+    body { margin:0; min-height:100vh; background:radial-gradient(circle at 20% 0%,#2a1d3f 0,#10111a 30%,#07090d 70%); }
+    header { display:flex; gap:12px; align-items:center; padding:16px 20px; border-bottom:1px solid #322b48; background:#0e0d16dd; backdrop-filter:blur(12px); }
+    header strong { font-size:19px; letter-spacing:.08em; }
+    .badge { font-size:11px; color:#cfb8ff; border:1px solid #574770; padding:4px 8px; border-radius:999px; }
+    #status { margin-left:auto; color:#a9a3ba; font-size:12px; }
+    #status[data-kind="ok"] { color:#99efc0; } #status[data-kind="error"] { color:#ff9eaa; }
+    .layout { display:grid; grid-template-columns:minmax(270px,1fr) minmax(380px,1.7fr) minmax(270px,1fr); gap:12px; padding:12px; }
+    .column { display:flex; flex-direction:column; gap:12px; min-width:0; }
+    .panel { padding:14px; border-radius:14px; border:1px solid #302943; background:#12101be8; box-shadow:0 18px 45px #0005; }
+    .panel h2 { margin:0 0 10px; color:#a895c7; text-transform:uppercase; letter-spacing:.14em; font-size:11px; }
+    .stack { display:flex; flex-direction:column; gap:7px; font-size:12px; }
+    .stack strong { color:#d9caef; }
+    code { color:#9ed8ff; overflow-wrap:anywhere; font-size:10px; }
+    dl { display:grid; grid-template-columns:125px 1fr; gap:7px; margin:0; font-size:11px; } dt { color:#9c8fb5; } dd { margin:0; min-width:0; }
+    .plan { min-height:310px; background:linear-gradient(#12101c,#0c0d14); }
+    .flow { display:grid; gap:7px; margin-top:12px; }
+    .node { border:1px solid #44365d; border-radius:8px; padding:10px; background:#171322; }
+    .arrow { text-align:center; color:#806aa5; }
+    .actions { display:grid; grid-template-columns:repeat(3,minmax(160px,1fr)); gap:8px; padding:0 12px 14px; }
+    button { border:1px solid #4b3d67; background:#1b1627; color:#ede5ff; padding:11px 12px; border-radius:9px; cursor:pointer; font:inherit; font-size:11px; }
+    button:hover { background:#251d35; border-color:#8667b5; }
+    .doctrine { color:#8f859f; line-height:1.65; font-size:11px; }
+    @media (max-width:950px){ .layout{grid-template-columns:1fr;} .actions{grid-template-columns:1fr;} }
+  </style>
+</head>
+<body>
+  <header>
+    <strong>WaveForgeStudio</strong>
+    <span class="badge">Interop Room v0.1</span>
+    <span class="badge">Reference-only release lane</span>
+    <span id="status">Waiting for ParaCut v2</span>
+  </header>
+
+  <div class="layout">
+    <div class="column">
+      <section class="panel"><h2>ParaCut Source</h2><div id="source-state" class="stack"></div></section>
+      <section class="panel"><h2>Creative Lineage</h2><div id="lineage-state" class="stack"></div></section>
+    </div>
+
+    <div class="column">
+      <section class="panel plan">
+        <h2>Accepted RenderPlan</h2>
+        <div id="plan-state" class="stack"></div>
+        <div class="flow">
+          <div class="node">ParaCut RenderPlan + planRevision</div>
+          <div class="arrow">↓ verify + freshness</div>
+          <div class="node">WaveForge intake receipt</div>
+          <div class="arrow">↓ package reference</div>
+          <div class="node">Interop release reference · no media render</div>
+        </div>
+      </section>
+      <section class="panel"><h2>Release Reference</h2><div id="release-state" class="stack"></div></section>
+    </div>
+
+    <div class="column">
+      <section class="panel"><h2>Latest Receipt</h2><div id="receipt-state" class="stack"></div></section>
+      <section class="panel doctrine">
+        <h2>Authority Boundary</h2>
+        This room verifies and packages references. It does not render media, publish, acquire media, call external networks,
+        or pretend a packaging reference is a WaveForge final release.
+        <br><br>
+        CineSwarm remains an unratified receiver.
+      </section>
+    </div>
+  </div>
+
+  <div class="actions">
+    <button id="receive">1 · Verify ParaCut Handoff</button>
+    <button id="accept">2 · Accept planRevision</button>
+    <button id="release">3 · Create Release Reference</button>
+  </div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

@@ -27,6 +27,14 @@ jobs:
       - name: Run tests
         run: pytest -q
 
+      - name: Setup Node.js for browser interop conformance
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Browser Interop Room smoke
+        run: node interop-room/smoke.mjs
+
       - name: Doctor
         run: python -m waveforge_studio.cli doctor
 
