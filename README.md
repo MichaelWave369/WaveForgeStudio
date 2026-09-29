@@ -1,5 +1,20 @@
 # WaveForgeStudio — PHI369 Sovereign Media Studio (v0.9)
 
+## WaveForge Interop Room v0.1
+
+The live browser receiver now carries Acceptance 003 from a real ParaCut RenderPlan into WaveForge:
+
+```text
+ParaCut v2 handoff
+→ verify + freshness
+→ WaveForge intake receipt
+→ non-rendered interop release reference
+```
+
+The Python bridge adapter remains authoritative. CI runs both Python and browser conformance.
+
+See [WaveForge Interop Room v0.1](docs/INTEROP_ROOM_V01.md).
+
 ## Parallax Creative Interop v2
 
 WaveForgeStudio now has a candidate lineage-aware ParaCut intake for:
