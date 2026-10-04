@@ -3,15 +3,13 @@
 **Extension ID:** `parallax.creative-interop.v2.cineswarm-reference`  
 **Sender:** WaveForgeStudio  
 **Target:** CineSwarm  
-**Receiver status:** `unratified_receiver`
+**Receiver status:** `ratified_receiver`
 
 ## Purpose
 
-This extension lets WaveForgeStudio prepare a bounded, hash-bound reference to a completed WaveForge final release for a future CineSwarm receiver.
+This extension lets WaveForgeStudio prepare a bounded, hash-bound reference to a completed WaveForge final release for the ratified CineSwarm receiver.
 
-It deliberately stops at the packet boundary.
-
-The current GitHub connection does not authorize writes to the CineSwarm repository, so this repository does not claim receiver adoption.
+Ratification means the two repositories agree on the reference format and its verification boundary. It does **not** grant execution authority.
 
 ## Packet
 
@@ -23,7 +21,7 @@ source:           WaveForgeStudio
 target:           CineSwarm
 interopProfile:   parallax.creative-interop.v2
 extensionProfile: parallax.creative-interop.v2.cineswarm-reference
-extensionStatus:  unratified_receiver
+extensionStatus:  ratified_receiver
 ```
 
 The native payload contains a reference to:
@@ -60,15 +58,15 @@ localOnly = true
 requiresUserAction = true
 ```
 
-A future CineSwarm receiver must independently verify the packet and require explicit human acceptance.
+The CineSwarm receiver independently verifies the packet. A valid packet can produce only a reference receipt pending separate explicit human acceptance.
 
 ## Why media acquisition is explicitly false
 
-CineSwarm may have media-library or acquisition capabilities of its own.
+CineSwarm has media, provider, and archival capabilities of its own.
 
-Receiving a WaveForge release reference MUST NOT be interpreted as permission to search for, download, import, acquire, publish, or replace media.
+Receiving a WaveForge release reference MUST NOT be interpreted as permission to search for, download, import, acquire, publish, render, execute, or replace media.
 
-The creative handoff and any library/acquisition policy remain separate authority domains.
+The creative handoff and every later authority domain remain separate.
 
 ## Usage
 
@@ -85,21 +83,28 @@ packet = create_cineswarm_release_reference(
 
 The function only builds a local data packet. It performs no network request.
 
-## Ratification requirement
+## Ratification evidence
 
-This extension remains unratified until an authorized CineSwarm repository:
+Receiver-side adoption is implemented in `MichaelWave369/CineSwarm` by `@parallax-network/cineswarm-bridge@0.27.0`.
 
-1. defines its receiver-side validation;
-2. independently verifies `contentHash`;
-3. preserves the explicit human-action boundary;
-4. rejects authority escalation;
-5. passes its native tests;
-6. records an explicit human adoption decision.
+The receiver:
 
-Until then, WaveForgeStudio may truthfully say:
+1. independently validates the canonical native payload hash;
+2. binds `transferId` to the WaveForge final-release SHA-256;
+3. verifies optional Creative Interop v2 lineage;
+4. rejects every authority escalation;
+5. recognizes historical `unratified_receiver` packets only for provenance/debugging;
+6. refuses to issue a receiver receipt for those historical unratified packets;
+7. emits only `REFERENCE_RECEIVED_PENDING_HUMAN_ACCEPTANCE` for a valid ratified packet.
 
-> a CineSwarm-compatible reference packet can be produced
+Receiver adoption was merged in CineSwarm PR #3 before this sender-side status transition.
 
-but MUST NOT say:
+WaveForgeStudio may therefore truthfully say:
 
-> CineSwarm accepted or imported the release.
+> CineSwarm has a ratified receiver for this reference format.
+
+It still MUST NOT say:
+
+> CineSwarm imported, rendered, acquired, published, or otherwise acted on the referenced release
+
+unless a separate authorized action and receipt establish that fact.
