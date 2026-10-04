@@ -65,7 +65,7 @@ def create_cineswarm_release_reference(
         "version": 2,
         "interopProfile": "parallax.creative-interop.v2",
         "extensionProfile": "parallax.creative-interop.v2.cineswarm-reference",
-        "extensionStatus": "unratified_receiver",
+        "extensionStatus": "ratified_receiver",
         "transferId": "waveforge-cineswarm:" + release_hash.lower(),
         "source": "WaveForgeStudio",
         "target": "CineSwarm",
@@ -76,11 +76,11 @@ def create_cineswarm_release_reference(
         "contentHash": content_hash,
         "trustLabels": ["reference-only", "release-lineage-bound"],
         "warnings": [
-            "CineSwarm receiver adoption is not ratified by this repository.",
+            "CineSwarm receiver is ratified for reference-only validation; local import/use still requires explicit human acceptance.",
         ],
         "compatibilityNotes": [
-            "Reference-only release handoff. This packet does not authorize CineSwarm import, acquisition, publishing, rendering, or network activity.",
-            "Receiver must independently verify contentHash and require explicit human acceptance before any local import.",
+            "Ratified reference-only release handoff. This packet does not authorize CineSwarm import, acquisition, publishing, rendering, or network activity.",
+            "CineSwarm independently verifies contentHash and still requires explicit human acceptance before any local import or use.",
         ],
         "lineageRef": (
             creative_lineage.get("creativeManifestHash")
@@ -109,8 +109,8 @@ def validate_cineswarm_release_reference(packet: dict[str, Any]) -> list[str]:
         errors.append("route invalid")
     if packet.get("extensionProfile") != "parallax.creative-interop.v2.cineswarm-reference":
         errors.append("extensionProfile invalid")
-    if packet.get("extensionStatus") != "unratified_receiver":
-        errors.append("extensionStatus must remain unratified_receiver")
+    if packet.get("extensionStatus") != "ratified_receiver":
+        errors.append("extensionStatus must be ratified_receiver")
     if packet.get("localOnly") is not True:
         errors.append("localOnly must be true")
     if packet.get("requiresUserAction") is not True:

@@ -2,7 +2,7 @@
   "schema": "parallax.creative_interop_profile_manifest.v2",
   "protocol_id": "parallax.creative-interop.v2",
   "status": "candidate_pending_repository_ratification",
-  "spec_sha256": "364448afa4997b4fb297a67e1d3cec73ec3bae500855ec21469a24df8ef01be0",
+  "spec_sha256": "c00e62851d145c53e925d23beaeb693b92cb1a34da30faf32ed818540fe6c7e2",
   "canonical_owned_scope": [
     "MichaelWave369/Domistika",
     "MichaelWave369/Auralith369",
@@ -13,8 +13,10 @@
     {
       "id": "parallax.creative-interop.v2.cineswarm-reference",
       "target": "CineSwarm",
-      "status": "unratified_receiver",
-      "receiver_repository": "not_authorized_in_current_github_connection"
+      "status": "ratified_receiver",
+      "receiver_repository": "MichaelWave369/CineSwarm",
+      "receiver_package": "@parallax-network/cineswarm-bridge@0.27.0",
+      "receiver_decision": "docs/CINESWARM_WAVEFORGE_RECEIVER_RATIFICATION.md"
     }
   ],
   "bridge_envelopes": {
@@ -54,5 +56,7 @@
       "same_different_hash": "reject_equivocation"
     }
   },
-  "canonicality_scope": "owned_four_app_chain_only"
+  "canonicality_scope": "owned_four_app_chain_only",
+  "previous_spec_sha256": "364448afa4997b4fb297a67e1d3cec73ec3bae500855ec21469a24df8ef01be0",
+  "ratification_change": "CineSwarm optional receiver adopted before WaveForge sender promotion"
 }

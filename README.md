@@ -9,7 +9,7 @@ Domistika
 → Auralith369
 → ParaCut RenderPlan
 → WaveForgeStudio
-→ CineSwarm (reference-only / unratified extension)
+→ CineSwarm (ratified reference-only receiver)
 ```
 
 The shared interoperability profile is intentionally bounded and receipt-driven. Each stage verifies the artifacts it consumes, preserves lineage, and does not inherit execution authority merely because an upstream tool emitted a handoff.
@@ -42,7 +42,7 @@ Domistika
 
 The v2 intake independently verifies the ParaCut RenderPlan hash, creative-lineage hashes, `lineageRef`, monotonic `planRevision`, and explicit false authority flags. The existing v1 intake remains supported.
 
-WaveForge can also build an optional **reference-only CineSwarm packet**. The CineSwarm receiver is currently unratified, so that packet performs no network call, no automatic import, no acquisition, no publishing, and grants no render authority.
+WaveForge can also build an optional **reference-only CineSwarm packet**. CineSwarm now has a ratified receiver for this format, but the packet still performs no network call, no automatic import, no acquisition, no publishing, and grants no render authority. A valid receiver receipt remains pending separate explicit human acceptance.
 
 See:
 

@@ -35,7 +35,7 @@ parallax.creative-interop.v2.cineswarm-reference
 
 targeting CineSwarm.
 
-This extension is **not canonical** until an authorized CineSwarm receiver repository independently adopts and verifies the contract.
+This optional extension is now **receiver-ratified** by the authorized CineSwarm repository. Receiver ratification recognizes the reference format only; it does not expand the owned canonical four-app chain or transfer execution authority.
 
 The extension MUST remain:
 
@@ -48,7 +48,7 @@ The extension MUST remain:
 - non-acquiring;
 - non-auto-importing.
 
-The sender packet is an interoperability offer, not evidence of receiver adoption.
+The sender packet is a ratified interoperability reference, not evidence that CineSwarm imported or acted on the referenced release.
 
 ## 4. Required authority invariants
 
@@ -232,15 +232,15 @@ Application product versions remain independent of profile version.
 
 The WaveForge-owned CineSwarm extension may carry a hash-bound reference to a WaveForge final release and optional v2 creative lineage.
 
-Until an authorized CineSwarm receiver adopts the profile:
+The authorized CineSwarm receiver adopted the extension before sender-side promotion. New packets therefore carry:
 
 ```text
-extensionStatus = unratified_receiver
+extensionStatus = ratified_receiver
 ```
 
-MUST remain explicit.
+Historical packets with `unratified_receiver` remain historical and MUST NOT be rewritten or reinterpreted as ratified receipts.
 
-The sender MUST NOT claim that CineSwarm accepted, imported, acquired, published, rendered, or verified the release.
+The sender MUST NOT claim that CineSwarm imported, acquired, published, rendered, or otherwise acted on a release merely because the receiver format is ratified.
 
 ## 14. Rollback
 
@@ -252,7 +252,7 @@ Rollback MUST NOT:
 - rewrite historical hashes;
 - mutate historical receipts;
 - reinterpret a v1 packet as v2;
-- convert an unratified extension into a ratified receiver.
+- rewrite a historical unratified packet as though it had been emitted after receiver ratification.
 
 ## 15. Conformance evidence
 
@@ -266,7 +266,7 @@ Candidate conformance requires:
 - authority-escalation tests;
 - v1 compatibility tests;
 - CineSwarm extension fail-closed tests;
-- explicit human adoption before canonical promotion.
+- explicit human adoption before receiver-ratified promotion; CineSwarm satisfies this requirement for the optional release-reference extension.
 
 ## 16. Change control
 
