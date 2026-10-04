@@ -13,8 +13,10 @@
     {
       "id": "parallax.creative-interop.v2.cineswarm-reference",
       "target": "CineSwarm",
-      "status": "unratified_receiver",
-      "receiver_repository": "not_authorized_in_current_github_connection"
+      "status": "ratified_receiver",
+      "receiver_repository": "MichaelWave369/CineSwarm",
+      "receiver_package": "@parallax-network/cineswarm-bridge@0.27.0",
+      "receiver_decision": "docs/CINESWARM_WAVEFORGE_RECEIVER_RATIFICATION.md"
     }
   ],
   "bridge_envelopes": {
