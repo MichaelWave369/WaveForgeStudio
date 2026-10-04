@@ -49,7 +49,7 @@ def _lineage() -> dict:
     }
 
 
-def test_cineswarm_reference_is_local_reference_only_and_unratified():
+def test_cineswarm_reference_is_local_reference_only_and_ratified():
     packet = create_cineswarm_release_reference(_final_release(), creative_lineage=_lineage())
     assert_valid_cineswarm_release_reference(packet)
 
@@ -58,7 +58,7 @@ def test_cineswarm_reference_is_local_reference_only_and_unratified():
     assert packet["target"] == "CineSwarm"
     assert packet["interopProfile"] == "parallax.creative-interop.v2"
     assert packet["extensionProfile"] == "parallax.creative-interop.v2.cineswarm-reference"
-    assert packet["extensionStatus"] == "unratified_receiver"
+    assert packet["extensionStatus"] == "ratified_receiver"
     assert packet["localOnly"] is True
     assert packet["requiresUserAction"] is True
     assert packet["lineageRef"] == _lineage()["creativeManifestHash"]
@@ -102,3 +102,12 @@ def test_cineswarm_reference_requires_valid_lineage_hash():
         assert "creative_lineage.creativeManifestHash" in str(exc)
     else:
         raise AssertionError("invalid creative lineage hash should fail closed")
+
+def test_cineswarm_reference_rejects_status_downgrade_after_ratification():
+    packet = create_cineswarm_release_reference(_final_release(), creative_lineage=_lineage())
+    downgraded = copy.deepcopy(packet)
+    downgraded["extensionStatus"] = "unratified_receiver"
+
+    errors = validate_cineswarm_release_reference(downgraded)
+    assert "extensionStatus must be ratified_receiver" in errors
+
