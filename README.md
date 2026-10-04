@@ -1,4 +1,18 @@
-# WaveForgeStudio — PHI369 Sovereign Media Studio (v0.9)
+# WaveForgeStudio — PHI369 Sovereign Media Studio (v3.0-alpha)
+
+## Parallax Creative Stack
+
+WaveForgeStudio is the release and media-assembly stage of the Parallax Creative Stack:
+
+```text
+Domistika
+→ Auralith369
+→ ParaCut RenderPlan
+→ WaveForgeStudio
+→ CineSwarm (reference-only / unratified extension)
+```
+
+The shared interoperability profile is intentionally bounded and receipt-driven. Each stage verifies the artifacts it consumes, preserves lineage, and does not inherit execution authority merely because an upstream tool emitted a handoff.
 
 ## WaveForge Interop Room v0.1
 
@@ -268,7 +282,7 @@ python -m waveforge_studio.cli forge "Final Release Demo Two" --out runs/final_r
 python -m waveforge_studio.cli finalize-release runs --out runs/final_release --title "Golden Signal Release" --include-tag has-zip
 ```
 
-# WaveForgeStudio v3.0-alpha
+## Release maturity
 
 ## Golden operator path
 1. Forge runs

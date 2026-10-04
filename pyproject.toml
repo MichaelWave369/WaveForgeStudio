@@ -7,6 +7,7 @@ name = "waveforge-studio"
 version = "3.0-alpha"
 description = "WaveForgeStudio — PHI369 Sovereign Media Studio"
 readme = "README.md"
+license = { text = "MIT" }
 requires-python = ">=3.11"
 dependencies = []
 
