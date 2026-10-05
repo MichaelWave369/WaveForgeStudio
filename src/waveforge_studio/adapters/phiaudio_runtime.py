@@ -9,6 +9,7 @@ from typing import Any
 
 from ..artifact_ledger import file_sha256
 from ..hashing import sha256_digest
+from ..phiaudio_runtime_lock import phiaudio_runtime_lock
 
 
 class PHIAudioRuntimeError(RuntimeError):
@@ -25,6 +26,10 @@ class PHIAudioRuntimeResult:
     master_sha256: str
     stem_count: int
     warnings: tuple[str, ...]
+    runtime_repository: str
+    runtime_commit: str
+    runtime_lock_sha256: str
+    runtime_executable_sha256: str
 
 
 class PHIAudioRuntimeAdapter:
@@ -255,6 +260,7 @@ class PHIAudioRuntimeAdapter:
         ):
             raise PHIAudioRuntimeError("PHIAudio warnings must be strings")
 
+        lock = phiaudio_runtime_lock()
         return PHIAudioRuntimeResult(
             status="verified",
             runtime_command=self.runtime_command,
@@ -264,4 +270,8 @@ class PHIAudioRuntimeAdapter:
             master_sha256=master_sha256,
             stem_count=len(stems),
             warnings=tuple(warnings),
+            runtime_repository=str(lock["repository"]),
+            runtime_commit=str(lock["commit"]),
+            runtime_lock_sha256=str(lock["lock_sha256"]),
+            runtime_executable_sha256=file_sha256(Path(executable)),
         )
