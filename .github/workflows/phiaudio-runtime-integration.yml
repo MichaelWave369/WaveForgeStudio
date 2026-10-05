@@ -1,0 +1,119 @@
+name: PHIAudio Runtime Integration
+
+on:
+  pull_request:
+    branches: [main]
+    paths:
+      - "src/waveforge_studio/adapters/phiaudio_runtime.py"
+      - "src/waveforge_studio/cli.py"
+      - ".github/workflows/phiaudio-runtime-integration.yml"
+      - "docs/PHIAUDIO_REAL_RUNTIME_QUALIFICATION.md"
+  workflow_dispatch:
+
+permissions:
+  contents: read
+
+jobs:
+  real-phiaudio:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout WaveForgeStudio
+        uses: actions/checkout@v4
+
+      - name: Setup Python
+        uses: actions/setup-python@v5
+        with:
+          python-version: "3.11"
+
+      - name: Install WaveForgeStudio
+        run: python -m pip install -e .[test]
+
+      - name: Checkout pinned PHIAudio
+        uses: actions/checkout@v4
+        with:
+          repository: MichaelWave369/PHIAudio
+          ref: 2c4855ba9bf7687428347733f4ae435bbee5a934
+          path: external/PHIAudio
+
+      - name: Setup Node
+        uses: actions/setup-node@v4
+        with:
+          node-version: 22
+
+      - name: Build real PHIAudio runtime
+        working-directory: external/PHIAudio
+        run: |
+          npm install
+          npm run typecheck
+          npm test
+
+      - name: Expose phiaudio-render command
+        run: |
+          mkdir -p "$RUNNER_TEMP/phiaudio-bin"
+          cat > "$RUNNER_TEMP/phiaudio-bin/phiaudio-render" <<EOF
+          #!/usr/bin/env bash
+          exec node "$GITHUB_WORKSPACE/external/PHIAudio/dist/src/cli/phiaudio-render.js" "\$@"
+          EOF
+          chmod +x "$RUNNER_TEMP/phiaudio-bin/phiaudio-render"
+          echo "$RUNNER_TEMP/phiaudio-bin" >> "$GITHUB_PATH"
+
+      - name: Confirm runtime discovery
+        run: |
+          waveforge-studio phiaudio-runtime-status             > phiaudio-runtime-status.json
+          python - <<'PY'
+          import json
+          payload = json.load(open("phiaudio-runtime-status.json", encoding="utf-8"))
+          assert payload["available"] is True
+          assert payload["default_enabled"] is False
+          assert payload["requires_operator_enablement"] is True
+          assert payload["network_allowed"] is False
+          PY
+
+      - name: Compile real WaveForge PHIAudio bundle
+        run: |
+          waveforge-studio compile             "Cross-repository PHIAudio qualification"             --duration 6             --seed 369             --mode qualification             --out runs/phiaudio_real             --export-phiaudio
+
+      - name: Render through real PHIAudio
+        run: |
+          waveforge-studio render-phiaudio             runs/phiaudio_real             --enable-phiaudio             --sample-rate 48000             > runs/phiaudio_real/waveforge_phiaudio_result.json
+
+      - name: Verify cross-repository artifacts
+        run: |
+          python - <<'PY'
+          import hashlib
+          import json
+          from pathlib import Path
+
+          root = Path("runs/phiaudio_real")
+          result = json.loads((root / "waveforge_phiaudio_result.json").read_text())
+          manifest = json.loads(
+              (root / "render/phiaudio/phiaudio_render_manifest.json").read_text()
+          )
+          receipt = json.loads(
+              (root / "render/phiaudio/phiaudio_render_receipt.json").read_text()
+          )
+          master = root / "render/phiaudio/master.wav"
+
+          assert result["status"] == "verified"
+          assert result["master_sha256"] == manifest["master"]["sha256"]
+          assert result["receipt_hash"] == receipt["receiptDigest"]
+          assert manifest["sourceSchema"] == "waveforge.phiaudio_bundle.v0"
+          assert manifest["networkUsed"] is False
+          assert manifest["operatorEnabled"] is True
+          assert master.read_bytes()[:4] == b"RIFF"
+          assert hashlib.sha256(master.read_bytes()).hexdigest() == result["master_sha256"]
+          assert len(manifest["stems"]) >= 1
+          PY
+
+      - name: Upload real PHIAudio qualification evidence
+        uses: actions/upload-artifact@v4
+        with:
+          name: waveforge-real-phiaudio-qualification
+          path: |
+            phiaudio-runtime-status.json
+            runs/phiaudio_real/phiaudio/phiaudio_bundle.json
+            runs/phiaudio_real/waveforge_phiaudio_result.json
+            runs/phiaudio_real/render/phiaudio/phiaudio_render_manifest.json
+            runs/phiaudio_real/render/phiaudio/phiaudio_render_receipt.json
+            runs/phiaudio_real/render/phiaudio/master.wav
+          if-no-files-found: error
