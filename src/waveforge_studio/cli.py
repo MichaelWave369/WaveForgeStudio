@@ -46,6 +46,7 @@ from .detached_signature import write_detached_signature_manifest, validate_deta
 from .renderer_adapters import write_renderer_adapter_manifest, validate_renderer_adapter_manifest
 from .ffmpeg_adapter_contract import write_ffmpeg_adapter_contract, validate_ffmpeg_adapter_contract
 from .phiaudio_adapter_contract import write_phiaudio_adapter_contract, validate_phiaudio_adapter_contract
+from .phiaudio_runtime_lock import phiaudio_runtime_lock
 from .waverider_adapter_contract import write_waverider_adapter_contract, validate_waverider_adapter_contract
 from .adapter_contract_bundle import write_adapter_contract_bundle, validate_adapter_contract_bundle_manifest
 
@@ -515,6 +516,12 @@ def inspect_command(a):
 
 def adapters_command(a): print(json.dumps(list_adapters(),indent=2)); return 0
 
+def phiaudio_runtime_lock_command(a):
+    del a
+    print(json.dumps(phiaudio_runtime_lock(), indent=2, sort_keys=True))
+    return 0
+
+
 def phiaudio_runtime_status_command(a):
     adapter = PHIAudioRuntimeAdapter(
         runtime_command=a.runtime_command,
@@ -562,6 +569,10 @@ def render_phiaudio_command(a):
                 "master_sha256": result.master_sha256,
                 "stem_count": result.stem_count,
                 "warnings": list(result.warnings),
+                "runtime_repository": result.runtime_repository,
+                "runtime_commit": result.runtime_commit,
+                "runtime_lock_sha256": result.runtime_lock_sha256,
+                "runtime_executable_sha256": result.runtime_executable_sha256,
             },
             indent=2,
             sort_keys=True,
@@ -637,6 +648,7 @@ def build_parser():
     r=sub.add_parser('release'); r.add_argument('path'); r.set_defaults(func=release_command)
     sm=sub.add_parser('smoke'); sm.add_argument('--out',required=True); sm.add_argument('--prompt',default='The Sovereign Signal awakens across the infinite fractal wave.'); sm.add_argument('--duration',type=int,default=72); sm.add_argument('--seed',type=int,default=369369); sm.add_argument('--mode',default='mythic-reel'); sm.add_argument('--render-audio-stub',action='store_true'); sm.add_argument('--render-visual-stub',action='store_true'); sm.add_argument('--av-preview',action='store_true'); sm.add_argument('--preview-pack',action='store_true'); sm.add_argument('--preview-pack-zip',action='store_true'); sm.set_defaults(func=smoke_command)
     d=sub.add_parser('doctor'); d.set_defaults(func=doctor_command)
+    prl=sub.add_parser('phiaudio-runtime-lock'); prl.set_defaults(func=phiaudio_runtime_lock_command)
     prs=sub.add_parser('phiaudio-runtime-status'); prs.add_argument('--runtime-command',default='phiaudio-render'); prs.add_argument('--timeout',type=float,default=60.0); prs.set_defaults(func=phiaudio_runtime_status_command)
     pra=sub.add_parser('render-phiaudio'); pra.add_argument('path'); pra.add_argument('--bundle',default='phiaudio/phiaudio_bundle.json'); pra.add_argument('--out',default='render/phiaudio'); pra.add_argument('--runtime-command',default='phiaudio-render'); pra.add_argument('--timeout',type=float,default=60.0); pra.add_argument('--sample-rate',type=int,default=48000); pra.add_argument('--enable-phiaudio',action='store_true'); pra.set_defaults(func=render_phiaudio_command)
     ra=sub.add_parser('render-audio-stub'); ra.add_argument('path'); ra.add_argument('--out',required=True); ra.add_argument('--max-duration',type=int,default=12); ra.add_argument('--sample-rate',type=int,default=48000); ra.set_defaults(func=render_audio_stub_command)
