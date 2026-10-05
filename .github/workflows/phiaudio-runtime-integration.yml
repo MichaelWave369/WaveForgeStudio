@@ -28,11 +28,23 @@ jobs:
       - name: Install WaveForgeStudio
         run: python -m pip install -e .[test]
 
+      - name: Resolve qualified PHIAudio runtime lock
+        id: phiaudio-lock
+        run: |
+          waveforge-studio phiaudio-runtime-lock > phiaudio-runtime-lock.json
+          python - <<'PY' >> "$GITHUB_OUTPUT"
+          import json
+          lock = json.load(open("phiaudio-runtime-lock.json", encoding="utf-8"))
+          print(f"repository={lock['repository']}")
+          print(f"commit={lock['commit']}")
+          print(f"lock_sha256={lock['lock_sha256']}")
+          PY
+
       - name: Checkout pinned PHIAudio
         uses: actions/checkout@v4
         with:
-          repository: MichaelWave369/PHIAudio
-          ref: 2c4855ba9bf7687428347733f4ae435bbee5a934
+          repository: ${{ steps.phiaudio-lock.outputs.repository }}
+          ref: ${{ steps.phiaudio-lock.outputs.commit }}
           path: external/PHIAudio
 
       - name: Setup Node
@@ -94,7 +106,12 @@ jobs:
           )
           master = root / "render/phiaudio/master.wav"
 
+          lock = json.loads(Path("phiaudio-runtime-lock.json").read_text())
           assert result["status"] == "verified"
+          assert result["runtime_repository"] == lock["repository"]
+          assert result["runtime_commit"] == lock["commit"]
+          assert result["runtime_lock_sha256"] == lock["lock_sha256"]
+          assert len(result["runtime_executable_sha256"]) == 64
           assert result["master_sha256"] == manifest["master"]["sha256"]
           assert result["receipt_hash"] == receipt["receiptDigest"]
           assert manifest["sourceSchema"] == "waveforge.phiaudio_bundle.v0"
@@ -111,6 +128,7 @@ jobs:
           name: waveforge-real-phiaudio-qualification
           path: |
             phiaudio-runtime-status.json
+            phiaudio-runtime-lock.json
             runs/phiaudio_real/phiaudio/phiaudio_bundle.json
             runs/phiaudio_real/waveforge_phiaudio_result.json
             runs/phiaudio_real/render/phiaudio/phiaudio_render_manifest.json
