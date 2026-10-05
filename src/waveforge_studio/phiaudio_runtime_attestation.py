@@ -65,6 +65,17 @@ def _git_value(root: Path, *args: str) -> str:
     return completed.stdout.strip()
 
 
+def _git_tracks(root: Path, relative_path: str) -> bool:
+    completed = subprocess.run(
+        ["git", "-C", str(root), "ls-files", "--error-unmatch", relative_path],
+        shell=False,
+        capture_output=True,
+        text=True,
+        check=False,
+    )
+    return completed.returncode == 0
+
+
 def create_phiaudio_runtime_attestation(
     runtime_root: str | Path,
 ) -> dict[str, Any]:
@@ -116,6 +127,12 @@ def create_phiaudio_runtime_attestation(
         None,
     )
 
+    dependency_lock_tracked = (
+        _git_tracks(root, dependency_lock)
+        if dependency_lock is not None
+        else False
+    )
+
     body: dict[str, Any] = {
         "schema": PHIAUDIO_RUNTIME_ATTESTATION_SCHEMA,
         "runtime_lock_sha256": lock["lock_sha256"],
@@ -131,6 +148,7 @@ def create_phiaudio_runtime_attestation(
         "dist_manifest_sha256": sha256_digest(dist_files),
         "dist_file_count": len(dist_files),
         "dependency_lock_present": dependency_lock is not None,
+        "dependency_lock_tracked": dependency_lock_tracked,
         "dependency_lock_file": dependency_lock,
         "dependency_lock_sha256": (
             _file_sha256(root / dependency_lock)
@@ -139,7 +157,7 @@ def create_phiaudio_runtime_attestation(
         ),
         "warnings": (
             []
-            if dependency_lock is not None
+            if dependency_lock_tracked
             else ["no_committed_dependency_lock"]
         ),
     }
