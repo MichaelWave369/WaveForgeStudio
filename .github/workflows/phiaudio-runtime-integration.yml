@@ -59,6 +59,23 @@ jobs:
           npm run typecheck
           npm test
 
+      - name: Attest qualified PHIAudio source and build
+        run: |
+          waveforge-studio phiaudio-runtime-attest             external/PHIAudio             --out phiaudio-runtime-attestation.json
+          python - <<'PY'
+          import json
+          att = json.load(open("phiaudio-runtime-attestation.json", encoding="utf-8"))
+          lock = json.load(open("phiaudio-runtime-lock.json", encoding="utf-8"))
+          assert att["runtime_lock_sha256"] == lock["lock_sha256"]
+          assert att["commit"] == lock["commit"]
+          assert att["git_tree_sha"] == lock["git_tree_sha"]
+          assert att["source_file_count"] > 0
+          assert att["dist_file_count"] > 0
+          assert len(att["source_manifest_sha256"]) == 64
+          assert len(att["dist_manifest_sha256"]) == 64
+          assert len(att["attestation_sha256"]) == 64
+          PY
+
       - name: Expose phiaudio-render command
         run: |
           mkdir -p "$RUNNER_TEMP/phiaudio-bin"
@@ -129,6 +146,7 @@ jobs:
           path: |
             phiaudio-runtime-status.json
             phiaudio-runtime-lock.json
+            phiaudio-runtime-attestation.json
             runs/phiaudio_real/phiaudio/phiaudio_bundle.json
             runs/phiaudio_real/waveforge_phiaudio_result.json
             runs/phiaudio_real/render/phiaudio/phiaudio_render_manifest.json
