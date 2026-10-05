@@ -2,6 +2,7 @@ from __future__ import annotations
 import argparse, json, sys
 from pathlib import Path
 from .adapters.phiaudio_bridge import write_phiaudio_bundle
+from .adapters.phiaudio_runtime import PHIAudioRuntimeAdapter, PHIAudioRuntimeError
 from .adapters.registry import list_adapters
 from .adapters.waverider_bridge import write_waverider_bundle
 from .adapters.wavetalk_bridge import write_wavetalk_bundle
@@ -514,6 +515,61 @@ def inspect_command(a):
 
 def adapters_command(a): print(json.dumps(list_adapters(),indent=2)); return 0
 
+def phiaudio_runtime_status_command(a):
+    adapter = PHIAudioRuntimeAdapter(
+        runtime_command=a.runtime_command,
+        timeout_seconds=a.timeout,
+    )
+    print(json.dumps(adapter.describe(), indent=2, sort_keys=True))
+    return 0
+
+
+def render_phiaudio_command(a):
+    adapter = PHIAudioRuntimeAdapter(
+        runtime_command=a.runtime_command,
+        timeout_seconds=a.timeout,
+    )
+    try:
+        result = adapter.render_bundle(
+            run_root=a.path,
+            bundle_path=a.bundle,
+            output_dir=a.out,
+            operator_enabled=a.enable_phiaudio,
+            sample_rate=a.sample_rate,
+        )
+    except PHIAudioRuntimeError as exc:
+        print(
+            json.dumps(
+                {
+                    "status": "blocked",
+                    "error": str(exc),
+                    "runtime_command": a.runtime_command,
+                },
+                indent=2,
+                sort_keys=True,
+            )
+        )
+        return 1
+
+    print(
+        json.dumps(
+            {
+                "status": result.status,
+                "runtime_command": result.runtime_command,
+                "source_bundle_hash": result.source_bundle_hash,
+                "manifest_hash": result.manifest_hash,
+                "receipt_hash": result.receipt_hash,
+                "master_sha256": result.master_sha256,
+                "stem_count": result.stem_count,
+                "warnings": list(result.warnings),
+            },
+            indent=2,
+            sort_keys=True,
+        )
+    )
+    return 0
+
+
 def export_phiaudio_command(a):
     p,e=_load_valid(a.path)
     if e: print('INVALID media packet'); return 1
@@ -581,6 +637,8 @@ def build_parser():
     r=sub.add_parser('release'); r.add_argument('path'); r.set_defaults(func=release_command)
     sm=sub.add_parser('smoke'); sm.add_argument('--out',required=True); sm.add_argument('--prompt',default='The Sovereign Signal awakens across the infinite fractal wave.'); sm.add_argument('--duration',type=int,default=72); sm.add_argument('--seed',type=int,default=369369); sm.add_argument('--mode',default='mythic-reel'); sm.add_argument('--render-audio-stub',action='store_true'); sm.add_argument('--render-visual-stub',action='store_true'); sm.add_argument('--av-preview',action='store_true'); sm.add_argument('--preview-pack',action='store_true'); sm.add_argument('--preview-pack-zip',action='store_true'); sm.set_defaults(func=smoke_command)
     d=sub.add_parser('doctor'); d.set_defaults(func=doctor_command)
+    prs=sub.add_parser('phiaudio-runtime-status'); prs.add_argument('--runtime-command',default='phiaudio-render'); prs.add_argument('--timeout',type=float,default=60.0); prs.set_defaults(func=phiaudio_runtime_status_command)
+    pra=sub.add_parser('render-phiaudio'); pra.add_argument('path'); pra.add_argument('--bundle',default='phiaudio/phiaudio_bundle.json'); pra.add_argument('--out',default='render/phiaudio'); pra.add_argument('--runtime-command',default='phiaudio-render'); pra.add_argument('--timeout',type=float,default=60.0); pra.add_argument('--sample-rate',type=int,default=48000); pra.add_argument('--enable-phiaudio',action='store_true'); pra.set_defaults(func=render_phiaudio_command)
     ra=sub.add_parser('render-audio-stub'); ra.add_argument('path'); ra.add_argument('--out',required=True); ra.add_argument('--max-duration',type=int,default=12); ra.add_argument('--sample-rate',type=int,default=48000); ra.set_defaults(func=render_audio_stub_command)
     arv=sub.add_parser('audio-render-validate'); arv.add_argument('path'); arv.set_defaults(func=audio_render_validate_command)
     rv=sub.add_parser('render-visual-stub'); rv.add_argument('path'); rv.add_argument('--out',required=True); rv.add_argument('--frame-count',type=int,default=9); rv.add_argument('--width',type=int,default=1280); rv.add_argument('--height',type=int,default=720); rv.set_defaults(func=render_visual_stub_command)
