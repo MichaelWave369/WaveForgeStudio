@@ -8,6 +8,7 @@ import sys
 
 from waveforge_studio.phiaudio_runtime_lock import (
     PHIAUDIO_RUNTIME_COMMIT,
+    PHIAUDIO_RUNTIME_GIT_TREE_SHA,
     PHIAUDIO_RUNTIME_REPOSITORY,
     phiaudio_runtime_lock,
 )
@@ -31,7 +32,9 @@ def test_runtime_lock_is_self_hashed_and_pins_known_good_source() -> None:
     assert lock["commit"] == PHIAUDIO_RUNTIME_COMMIT
     assert len(lock["commit"]) == 40
     assert len(lock["lock_sha256"]) == 64
-    assert lock["schema"] == "waveforge.phiaudio_runtime_lock.v0.1"
+    assert lock["schema"] == "waveforge.phiaudio_runtime_lock.v0.2"
+    assert lock["git_tree_sha"] == PHIAUDIO_RUNTIME_GIT_TREE_SHA
+    assert len(lock["git_tree_sha"]) == 40
     assert lock["cli_contract"] == "phiaudio-render.v0.1"
 
 
