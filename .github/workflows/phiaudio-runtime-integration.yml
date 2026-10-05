@@ -74,6 +74,9 @@ jobs:
           assert len(att["source_manifest_sha256"]) == 64
           assert len(att["dist_manifest_sha256"]) == 64
           assert len(att["attestation_sha256"]) == 64
+          assert att["dependency_lock_present"] is True
+          assert att["dependency_lock_tracked"] is False
+          assert "no_committed_dependency_lock" in att["warnings"]
           PY
 
       - name: Expose phiaudio-render command
